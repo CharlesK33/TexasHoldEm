@@ -100,7 +100,7 @@ public class ServerGUI extends JFrame
     this.setVisible(true);
     
     // Set up the chat server object.
-    server = new ChatServer();
+    server = new GameServer();
     server.setLog(log);
     server.setStatus(status);
 	}
