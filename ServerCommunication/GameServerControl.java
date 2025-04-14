@@ -8,7 +8,7 @@ public class GameServerControl
 	//driver for server-side game control
 	private HashMap<Integer, GameData> playerData;
 	
-	public GameServerControl()
+	public GameServerControl(Object arg)
 	{
 		
 	}

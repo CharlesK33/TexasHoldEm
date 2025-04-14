@@ -2,10 +2,11 @@ package ServerCommunication;
 
 import java.awt.Color;
 import java.io.IOException;
-
 import javax.swing.*;
-
 import CardGameData.*;
+import CardGameData.Error;
+import Database.*;
+import lab5out.BetData;
 import ocsf.server.*;
 
 
@@ -13,6 +14,8 @@ public class GameServer extends AbstractServer
 {
 	private JTextArea log;
 	private JLabel status;
+	private Database database;
+	private boolean running;
 	
 	public GameServer()
 	{
@@ -40,8 +43,14 @@ public class GameServer extends AbstractServer
 		return status;
 	}
 	
+	public boolean isRunning()
+	  {
+	    return running;
+	  }
+	
 	public void serverStarted()
 	{
+		running = true;
 		status.setText("Listening");
 	    status.setForeground(Color.GREEN);
 	    log.append("Server started\n");
@@ -56,6 +65,7 @@ public class GameServer extends AbstractServer
 	
 	public void serverClosed()
 	{
+		running = false;
 		status.setText("Close");
 	    status.setForeground(Color.RED);
 	    log.append("Server and all current clients are closed - press Listen to restart\n");
@@ -123,10 +133,55 @@ public class GameServer extends AbstractServer
 	        return;
 	      }
 	    }
+	    else if (arg0 instanceof BetData)
+	    {
+	    	BetData data = (BetData)arg0;
+	    }
+	    else if (arg0 instanceof CallData)
+	    {
+	    	CallData data = (CallData)arg0;
+	    }
+	    else if (arg0 instanceof Card)
+	    {
+	    	Card card = (Card)arg0;
+	    }
+	    else if (arg0 instanceof CheckData)
+	    {
+	    	CheckData data = (CheckData)arg0;
+	    }
+	    else if (arg0 instanceof Deck)
+	    {
+	    	Deck data = (Deck)arg0;
+	    }
+	    else if (arg0 instanceof RecordScoreData)
+	    {
+	    	RecordScoreData data = (RecordScoreData)arg0;
+	    }
+	    else if (arg0 instanceof Error)
+	    {
+	    	Error data = (Error)arg0;
+	    }
+	    else if (arg0 instanceof FoldData)
+	    {
+	    	FoldData data = (FoldData)arg0;
+	    }
+	    else if (arg0 instanceof GameData)
+	    {
+	    	GameData data = (GameData)arg0;
+	    }
+	    else if (arg0 instanceof Hand)
+	    {
+	    	Hand data = (Hand)arg0;
+	    }
+	    else if (arg0 instanceof RaiseData)
+	    {
+	    	RaiseData data = (RaiseData)arg0;
+	    }
 	}
 	
 	public void listeningException(Throwable exception)
 	{
+		running = false;
 		status.setText("Exception occurred while listening");
 	    status.setForeground(Color.RED);
 	    log.append("Listening exception: " + exception.getMessage() + "\n");

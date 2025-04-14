@@ -1,1 +1,13 @@
 /GameData.class
+/Card.class
+/Deck.class
+/Hand.class
+/RecordScoreData.class
+/RaiseData.class
+/FoldData.class
+/BetData.class
+/CheckData.class
+/CallData.class
+/LoginData.class
+/CreateAccountData.class
+/Error.class
