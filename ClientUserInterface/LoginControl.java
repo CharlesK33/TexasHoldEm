@@ -13,16 +13,15 @@ public class LoginControl implements ActionListener
 		this.container = container;
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent ae) 
 	{
 		String command = ae.getActionCommand();
 		
-		if (command.equals("Enter"))
+		if (command.equals("Submit"))
 		{
 			
 		}
-		else if (command.equals("Cancel"));
+		else if (command.equals("Cancel"))
 		{
 			CardLayout cardLayout = (CardLayout)container.getLayout();
 			cardLayout.show(container, "1");

@@ -23,7 +23,7 @@ public class CreateAccountControl implements ActionListener
 		{
 			
 		}
-		else if (command.equals("Cancel"));
+		else if (command.equals("Cancel"))
 		{
 			CardLayout cardLayout = (CardLayout)container.getLayout();
 			cardLayout.show(container, "1");
