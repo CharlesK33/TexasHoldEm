@@ -21,7 +21,7 @@ public class CreateAccountPanel extends JPanel
 		
 		// Instructional message panel
 		JPanel labelPanel = new JPanel(new GridLayout(2, 1, 5, 5));
-		errorLabel = new JLabel("");
+		errorLabel = new JLabel("", JLabel.CENTER);
 		errorLabel.setForeground(new Color(255, 0, 0));
 		JLabel instructionLabel = new JLabel("Please Create Username and Password", JLabel.CENTER);
 		instructionLabel.setFont(new Font("Times New Roman", Font.PLAIN, 30));
@@ -67,5 +67,25 @@ public class CreateAccountPanel extends JPanel
 		grid.add(buttonPanel);
 		
 		this.add(grid);
+	}
+	
+	public String getUsername()
+	{
+		return usernameField.getText();
+	}
+	
+	public String getPassword1()
+	{
+		return new String(passwordField1.getPassword());
+	}
+	
+	public String getPassword2()
+	{
+		return new String(passwordField2.getPassword());
+	}
+	
+	public void setError(String error)
+	{
+		errorLabel.setText(error);
 	}
 }

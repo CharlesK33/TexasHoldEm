@@ -6,15 +6,13 @@ import javax.swing.*;
 import CardGameData.*;
 import CardGameData.Error;
 import Database.*;
-import lab5out.BetData;
 import ocsf.server.*;
-
 
 public class GameServer extends AbstractServer
 {
 	private JTextArea log;
 	private JLabel status;
-	private Database database;
+	private Database database = new Database();
 	private boolean running;
 	
 	public GameServer()
@@ -102,6 +100,7 @@ public class GameServer extends AbstractServer
 	      }
 	      catch (IOException e)
 	      {
+	    	System.out.println("Failed");
 	        return;
 	      }
 	    }

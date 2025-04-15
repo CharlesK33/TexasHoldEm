@@ -2,6 +2,8 @@ package ClientUserInterface;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+
 import ClientCommunication.*;
 
 public class ClientGUI extends JFrame
@@ -9,8 +11,18 @@ public class ClientGUI extends JFrame
 	public ClientGUI()
 	{
 		GameClient client = new GameClient();
-		client.setHost("LocalHost");
+		client.setHost("localhost");
 		client.setPort(8300);
+		
+		try
+	    {
+	      client.openConnection();
+	    }
+	    catch (IOException e)
+	    {
+	      e.printStackTrace();
+	    }
+		
 		this.setTitle("Texas Hold 'Em");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -19,15 +31,18 @@ public class ClientGUI extends JFrame
 		
 		InitialControl ic = new InitialControl(container);
 		GameControl gc = new GameControl(container);
-		LoginControl lc = new LoginControl(container);
-		CreateAccountControl cac = new CreateAccountControl(container);
+		LoginControl lc = new LoginControl(container, client);
+		CreateAccountControl cac = new CreateAccountControl(container, client);
 		GameStartControl gsc = new GameStartControl(container);
+		
+		client.setLoginControl(lc);
+		client.setCreateAccountControl(cac);
 		
 		JPanel view1 = new InitialPanel(ic);
 		JPanel view2 = new LoginPanel(lc);
 		JPanel view3 = new CreateAccountPanel(cac);
-		JPanel view4 = new GamePanel(gc);
-		JPanel view5 = new GameStartPanel(gsc);
+		JPanel view4 = new GameStartPanel(gsc);
+		JPanel view5 = new GamePanel(gc);
 		
 		container.add(view1, "1");
 		container.add(view2, "2");
