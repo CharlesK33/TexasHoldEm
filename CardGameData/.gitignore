@@ -11,3 +11,5 @@
 /LoginData.class
 /CreateAccountData.class
 /Error.class
+/Card$Suit.class
+/Card$Value.class
