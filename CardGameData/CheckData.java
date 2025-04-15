@@ -1,7 +1,7 @@
 package CardGameData;
 
 public class CheckData {
-Boolean check;
+private Boolean check;
 
 public Boolean getCheck() {
 	return check;

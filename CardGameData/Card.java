@@ -29,8 +29,8 @@ private final int numValue;
 	
 	
 }
-String suit;
-String value;
+private String suit;
+private String value;
 
 public String getValue() {
 	return value;
