@@ -3,13 +3,13 @@ package CardGameData;
 import java.util.*;
 
 public class Hand {
-private ArrayList hand;
+private ArrayList<Card> hand;
 
-public ArrayList getHand() {
+public ArrayList<Card> getHand() {
 	return hand;
 }
 
-public void setHand(ArrayList hand) {
+public void setHand(ArrayList<Card> hand) {
 	this.hand = hand;
 } 
 }
