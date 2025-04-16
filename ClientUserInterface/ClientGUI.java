@@ -30,13 +30,14 @@ public class ClientGUI extends JFrame
 		JPanel container = new JPanel(cardLayout);
 		
 		InitialControl ic = new InitialControl(container);
-		GameControl gc = new GameControl(container);
+		GameControl gc = new GameControl(container, client);
 		LoginControl lc = new LoginControl(container, client);
 		CreateAccountControl cac = new CreateAccountControl(container, client);
-		GameStartControl gsc = new GameStartControl(container);
+		GameStartControl gsc = new GameStartControl(container, client);
 		
 		client.setLoginControl(lc);
 		client.setCreateAccountControl(cac);
+		client.setGameStartControl(gsc);
 		
 		JPanel view1 = new InitialPanel(ic);
 		JPanel view2 = new LoginPanel(lc);

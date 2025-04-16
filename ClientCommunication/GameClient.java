@@ -10,6 +10,7 @@ public class GameClient extends AbstractClient
 {
 	private LoginControl lc;
 	private CreateAccountControl cac;
+	private GameStartControl gsc;
 	
 	public GameClient()
 	{
@@ -24,6 +25,11 @@ public class GameClient extends AbstractClient
 	public void setCreateAccountControl(CreateAccountControl cac)
 	{
 		this.cac = cac;
+	}
+	
+	public void setGameStartControl(GameStartControl gsc)
+	{
+		this.gsc = gsc;
 	}
 	
 	public void handleMessageFromServer(Object arg0)

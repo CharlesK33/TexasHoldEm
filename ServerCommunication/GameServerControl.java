@@ -2,15 +2,20 @@ package ServerCommunication;
 
 import java.util.HashMap;
 import CardGameData.*;
+import javax.swing.*;
 
 public class GameServerControl 
 {
 	//driver for server-side game control
 	private HashMap<Integer, GameData> playerData;
+	private Object arg;
+	private JLabel playerScoreLabel;
+	private JLabel usernameLabel;
+	private GameData gameData;
 	
 	public GameServerControl(Object arg)
 	{
-		
+		this.arg = arg;
 	}
 	
 	public void processGameData()
@@ -26,6 +31,15 @@ public class GameServerControl
 	public void startHand()
 	{
 		
+	}
+	
+	public GameData startGame(String username)
+	{
+		playerScoreLabel = new JLabel("100");
+		usernameLabel = new JLabel(username);
+		gameData = new GameData();
+		gameData.setScore();
+		return gameData;
 	}
 	
 	public void setPosition()

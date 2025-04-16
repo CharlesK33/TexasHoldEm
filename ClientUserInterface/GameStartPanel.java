@@ -32,7 +32,9 @@ public class GameStartPanel extends JPanel
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setBackground(new Color(30, 92, 58));
 		startButton = new JButton("Start Game");
+		startButton.addActionListener(gsc);
 		joinButton = new JButton("Join Game");
+		joinButton.addActionListener(gsc);
 		buttonPanel.add(startButton);
 		buttonPanel.add(joinButton);
 		

@@ -132,6 +132,17 @@ public class GameServer extends AbstractServer
 	        return;
 	      }
 	    }
+	    else if (arg0 instanceof StartGameData)
+	    {
+	    	StartGameData data = (StartGameData)arg0;
+	    	GameData gameData;
+	    	
+	    	if (data.getStart()) 
+	    	{
+	    		GameServerControl gameServerControl = new GameServerControl(data);
+	    		gameServerControl.startGame(data.getUsername());
+	    	}
+	    }
 	    else if (arg0 instanceof BetData)
 	    {
 	    	BetData data = (BetData)arg0;
