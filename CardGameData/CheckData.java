@@ -1,21 +1,18 @@
 package CardGameData;
 
-public class CheckData 
-{
-	private Boolean check;
+import java.io.Serializable;
 
-	public CheckData(boolean check)
-	{
-		setCheck(check);
-	}
-	public Boolean getCheck() 
-	{
-		return check;
-	}
+public class CheckData implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	public void setCheck(Boolean check) 
-	{
-		this.check = check;
-	}
+    private boolean checked;
 
+    public CheckData(boolean checked) {
+        this.checked = checked;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
 }
+

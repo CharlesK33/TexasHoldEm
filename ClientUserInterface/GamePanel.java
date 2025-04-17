@@ -164,9 +164,17 @@ public class GamePanel extends JPanel
 		playerBet.setText(Integer.toString(bet));
 	}
 	
-	public int getPlayerBetAmt()
+	
+	//Parses the best amount entered by the player
+	//Returns 0 if the label is blank 
+	public int getPlayerBetAmt() 
 	{
-		return Integer.parseInt(playerBet.getText());
+	    String betText = playerBet.getText().trim();
+	    if (betText.equals("")) 
+	    {
+	        return 0;
+	    }
+	    return Integer.parseInt(betText);
 	}
 	
 	public int getCurrentBet()

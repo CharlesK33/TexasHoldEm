@@ -2,3 +2,5 @@
 /GameServerControl.class
 /ServerGUI$EventHandler.class
 /ServerGUI.class
+/GameSession.class
+/GameSession$GamePhase.class

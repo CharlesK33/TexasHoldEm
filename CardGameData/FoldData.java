@@ -1,19 +1,17 @@
 package CardGameData;
 
-public class FoldData {
-	private Boolean fold;
+import java.io.Serializable;
 
-	public Boolean getFold() {
-		return fold;
-	}
+public class FoldData implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	public void setFold(Boolean fold) {
-		this.fold = fold;
-	}
-	
-	public FoldData(boolean fold)
-	{
-		setFold(fold);
-	}
+    private boolean folded;
 
+    public FoldData(boolean folded) {
+        this.folded = folded;
+    }
+
+    public boolean isFolded() {
+        return folded;
+    }
 }
