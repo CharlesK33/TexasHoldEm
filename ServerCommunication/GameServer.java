@@ -16,6 +16,8 @@ public class GameServer extends AbstractServer {
 	private boolean running;
 	private ArrayList<String> players = new ArrayList<String>();
 	private GameServerControl gameServerControl;
+	private Map<ConnectionToClient, String> clientToUsername = new HashMap<>();
+
 
 
 
@@ -71,6 +73,12 @@ public class GameServer extends AbstractServer {
 	public void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 		// If we received LoginData, verify the account information.
 		if (arg0 instanceof LoginData) {
+			
+			
+	
+
+			
+			
 			// Check the username and password with the database.
 			LoginData data = (LoginData) arg0;
 			Object result;
@@ -113,29 +121,30 @@ public class GameServer extends AbstractServer {
 		} else if (arg0 instanceof StartGameData) {
 		    StartGameData data = (StartGameData) arg0;
 
-		    //If starting the game, initialize GameSession
-		    if (data.getStart()) {
-		    	
-		    	
-		    	gameServerControl = new GameServerControl(arg1); 
-		    	GameData gameData = gameServerControl.startGame(data.getUsername());
-
-
-		        try {
-		            arg1.sendToClient(gameData); //triggers displayGameStart()
-		        } catch (IOException e) {
-		            log.append("Failed to send GameData\n");
-		        }
-		        
-		       
-		   
-
-		        log.append("Game started by " + data.getUsername() + "\n");
-
-		        //Broadcast initial game state to all connected clients
-		        broadcastGameState();
+		    if (gameServerControl == null) {
+		        gameServerControl = new GameServerControl();
 		    }
+
+		    clientToUsername.put(arg1, data.getUsername());
+		    gameServerControl.addPlayer(data.getUsername());
+
+		    GameData gameData = new GameData();
+		    gameData.setUsername(data.getUsername());
+		    gameData.setCurrentBet(gameServerControl.getCurrentBet());
+		    gameData.setScore(gameServerControl.getPot());
+		    gameData.setStart(true); // still triggers GamePanel
+
+		    try {
+		        arg1.sendToClient(gameData);
+		    } catch (IOException e) {
+		        log.append("Failed to send GameData to " + data.getUsername() + "\n");
+		    }
+
+		    log.append((data.getStart() ? "Game started by " : "Player joined: ") + data.getUsername() + "\n");
+
+		    broadcastGameState();
 		}
+
 		else if (arg0 instanceof BetData) {
 		    BetData data = (BetData) arg0;
 		    String username = getClientUsername(arg1);
@@ -214,12 +223,9 @@ public class GameServer extends AbstractServer {
 	public void broadcastGameState() {
 	    if (gameServerControl == null) return;
 
-	    for (Thread clientThread : getClientConnections()) {
-	        ConnectionToClient client = (ConnectionToClient) clientThread;
-	        String username = getClientUsername(client);
-
+	    for (ConnectionToClient client : clientToUsername.keySet()) {
+	        String username = clientToUsername.get(client);
 	        GameData data = gameServerControl.getGameDataForPlayer(username);
-
 	        try {
 	            client.sendToClient(data);
 	        } catch (IOException e) {
@@ -233,10 +239,11 @@ public class GameServer extends AbstractServer {
 	
 	
 	public String getClientUsername(ConnectionToClient client) {
-	    // TODO: Replace this with actual player mapping later
-	    return "sofiane"; // Hardcoded for now
+	    return clientToUsername.getOrDefault(client, "Unknown");
 	}
 
-
-
 }
+
+
+
+

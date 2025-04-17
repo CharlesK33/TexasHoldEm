@@ -24,14 +24,8 @@ public class GameServerControl {
     }
 
     // Constructor: initialize with client connection
-    public GameServerControl(ConnectionToClient client) {
-        this.client = client;
-    }
-
-    // Starts a new game, initializes game state and deals cards
-    public GameData startGame(String username) {
+    public GameServerControl() {
         players = new ArrayList<>();
-        players.add(username);
         hands = new HashMap<>();
         deck = new Deck();
         board = new ArrayList<>();
@@ -39,14 +33,6 @@ public class GameServerControl {
         currentBet = 0;
         currentPlayerIndex = 0;
         phase = GamePhase.PRE_FLOP;
-
-        dealHoleCards();
-
-        GameData gameData = new GameData();
-        gameData.setScore(100);
-        gameData.setUsername(username);
-        gameData.setStart(true);
-        return gameData;
     }
 
     // Adds a new player joining an existing game
@@ -165,5 +151,33 @@ public class GameServerControl {
         data.setCurrentBet(currentBet); 
         return data;
     }
+    
+    
+    public void addPlayer(String username) {
+        if (!players.contains(username)) {
+            players.add(username);
+        }
+    }
+    
+    public GameData startGame(String username) {
+        // Optionally initialize or reset anything per-player here
+        GameData data = new GameData();
+        data.setUsername(username);
+        data.setCurrentBet(currentBet);
+        data.setScore(pot);
+        data.setStart(true); // used to trigger GamePanel switch
+        return data;
+    }
+    
+    public int getCurrentBet() {
+        return currentBet;
+    }
+
+    public int getPot() {
+        return pot;
+    }
+
+
+
 
 }
