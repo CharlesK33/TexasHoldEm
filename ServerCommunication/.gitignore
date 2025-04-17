@@ -4,3 +4,4 @@
 /ServerGUI.class
 /GameSession.class
 /GameSession$GamePhase.class
+/GameServerControl$GamePhase.class

@@ -15,7 +15,8 @@ public class GameServer extends AbstractServer {
 	private Database database = new Database();
 	private boolean running;
 	private ArrayList<String> players = new ArrayList<String>();
-	private GameSession gameSession;
+	private GameServerControl gameServerControl;
+
 
 
 	public GameServer() {
@@ -116,8 +117,9 @@ public class GameServer extends AbstractServer {
 		    if (data.getStart()) {
 		    	
 		    	
-		    	GameServerControl gameServerControl = new GameServerControl(arg1);
-		        GameData gameData = gameServerControl.startGame(data.getUsername());
+		    	gameServerControl = new GameServerControl(arg1); 
+		    	GameData gameData = gameServerControl.startGame(data.getUsername());
+
 
 		        try {
 		            arg1.sendToClient(gameData); //triggers displayGameStart()
@@ -126,9 +128,7 @@ public class GameServer extends AbstractServer {
 		        }
 		        
 		       
-		        List<String> playerUsernames = new ArrayList<>();
-		        playerUsernames.add(data.getUsername()); //add more players later
-		        gameSession = new GameSession(playerUsernames);
+		   
 
 		        log.append("Game started by " + data.getUsername() + "\n");
 
@@ -139,22 +139,22 @@ public class GameServer extends AbstractServer {
 		else if (arg0 instanceof BetData) {
 		    BetData data = (BetData) arg0;
 		    String username = getClientUsername(arg1);
-		    gameSession.handleBet(username, data.getBetAmount());
+		    gameServerControl.handleBet(username, data.getBetAmount());
 		    broadcastGameState();
 		}
 		else if (arg0 instanceof CallData) {
 		    String username = getClientUsername(arg1);
-		    gameSession.handleCall(username);
+		    gameServerControl.handleCall(username);
 		    broadcastGameState();
 		}
 		else if (arg0 instanceof CheckData) {
 		    String username = getClientUsername(arg1);
-		    gameSession.handleCheck(username);
+		    gameServerControl.handleCheck(username);
 		    broadcastGameState();
 		}
 		else if (arg0 instanceof FoldData) {
 		    String username = getClientUsername(arg1);
-		    gameSession.handleFold(username);
+		    gameServerControl.handleFold(username);
 		    broadcastGameState();
 		}
 		else if (arg0 instanceof Card) 
@@ -186,7 +186,7 @@ public class GameServer extends AbstractServer {
 			RaiseData data = (RaiseData) arg0;
 			GameData gameData;
 
-			GameServerControl gameServerControl = new GameServerControl(arg1);
+		
 			gameData = gameServerControl.updatePot();
 
 			/*
@@ -212,13 +212,13 @@ public class GameServer extends AbstractServer {
 	
 	//Sends the current game state to all clients
 	public void broadcastGameState() {
-	    if (gameSession == null) return;
+	    if (gameServerControl == null) return;
 
 	    for (Thread clientThread : getClientConnections()) {
 	        ConnectionToClient client = (ConnectionToClient) clientThread;
 	        String username = getClientUsername(client);
 
-	        GameData data = gameSession.getGameDataForPlayer(username);
+	        GameData data = gameServerControl.getGameDataForPlayer(username);
 
 	        try {
 	            client.sendToClient(data);
