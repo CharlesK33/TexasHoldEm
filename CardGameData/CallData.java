@@ -1,6 +1,8 @@
 package CardGameData;
 
-public class CallData {
+import java.io.Serializable;
+
+public class CallData implements Serializable{
 
 	int currentBetAmount;
 	public void setCurrentBet(int currentBetAmount) {
@@ -10,4 +12,8 @@ public class CallData {
 		return currentBetAmount;
 	}
 	
+	public CallData(int bet)
+	{
+		setCurrentBet(bet);
+	}
 }

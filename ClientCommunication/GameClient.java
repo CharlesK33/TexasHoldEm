@@ -11,6 +11,7 @@ public class GameClient extends AbstractClient
 	private LoginControl lc;
 	private CreateAccountControl cac;
 	private GameStartControl gsc;
+	private GameControl gc;
 	
 	public GameClient()
 	{
@@ -30,6 +31,11 @@ public class GameClient extends AbstractClient
 	public void setGameStartControl(GameStartControl gsc)
 	{
 		this.gsc = gsc;
+	}
+	
+	public void setGameControl(GameControl gc)
+	{
+		this.gc = gc;
 	}
 	
 	public void handleMessageFromServer(Object arg0)
@@ -71,6 +77,22 @@ public class GameClient extends AbstractClient
 	        cac.displayError(error.getMessage());
 	      }
 	    }
+	    
+	    else if (arg0 instanceof GameData)
+	    {
+	    	GameData gameData = (GameData)arg0;
+	    	if (gameData.getStart())
+	    	{
+	    		gsc.startGame();
+	    	}
+	    	else if(!gameData.getStart())
+	    	{
+	    		
+	    	}
+	  
+	    	gc.updatePanel(gameData);
+	    }
+	    
 	}
 	
 	public void connectionException(Throwable exception)

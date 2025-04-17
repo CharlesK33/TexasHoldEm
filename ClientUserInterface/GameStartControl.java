@@ -1,5 +1,6 @@
 package ClientUserInterface;
 
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -53,6 +54,12 @@ public class GameStartControl implements ActionListener
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void startGame()
+	{
+		CardLayout cardLayout = (CardLayout)container.getLayout();
+		cardLayout.show(container, "5");
 	}
 	
 	public void displayError(String error)

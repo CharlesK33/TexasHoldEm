@@ -38,6 +38,7 @@ public class ClientGUI extends JFrame
 		client.setLoginControl(lc);
 		client.setCreateAccountControl(cac);
 		client.setGameStartControl(gsc);
+		client.setGameControl(gc);
 		
 		JPanel view1 = new InitialPanel(ic);
 		JPanel view2 = new LoginPanel(lc);

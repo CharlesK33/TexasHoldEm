@@ -1,10 +1,14 @@
 package CardGameData;
 
-public class GameData {
+import java.io.Serializable;
+
+public class GameData implements Serializable{
 private String username;
 private int score;
 private int pot;
 private int currentBet;
+private boolean start;
+
 public String getUsername() {
 	return username;
 }
@@ -28,6 +32,16 @@ public int getCurrentBet() {
 }
 public void setCurrentBet(int currentBet) {
 	this.currentBet = currentBet;
+}
+
+public void setStart(boolean start)
+{
+	this.start = start;
+}
+
+public boolean getStart()
+{
+	return start;
 }
 
 }

@@ -10,5 +10,10 @@ public class FoldData {
 	public void setFold(Boolean fold) {
 		this.fold = fold;
 	}
+	
+	public FoldData(boolean fold)
+	{
+		setFold(fold);
+	}
 
 }

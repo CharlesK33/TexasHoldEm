@@ -7,194 +7,211 @@ import CardGameData.*;
 import CardGameData.Error;
 import Database.*;
 import ocsf.server.*;
+import java.util.*;
 
-public class GameServer extends AbstractServer
-{
+public class GameServer extends AbstractServer {
 	private JTextArea log;
 	private JLabel status;
 	private Database database = new Database();
 	private boolean running;
-	
-	public GameServer()
-	{
+	private ArrayList<String> players = new ArrayList<String>();
+
+	public GameServer() {
 		super(12345);
-	    this.setTimeout(500);
+		this.setTimeout(500);
 	}
-	
-	public void setLog(JTextArea log)
-	{
+
+	public void setLog(JTextArea log) {
 		this.log = log;
 	}
-	
-	public JTextArea getLog()
-	{
+
+	public JTextArea getLog() {
 		return log;
 	}
-	
-	public void setStatus(JLabel status)
-	{
+
+	public void setStatus(JLabel status) {
 		this.status = status;
 	}
-	
-	public JLabel getStatus()
-	{
+
+	public JLabel getStatus() {
 		return status;
 	}
-	
-	public boolean isRunning()
-	  {
-	    return running;
-	  }
-	
-	public void serverStarted()
-	{
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void serverStarted() {
 		running = true;
 		status.setText("Listening");
-	    status.setForeground(Color.GREEN);
-	    log.append("Server started\n");
+		status.setForeground(Color.GREEN);
+		log.append("Server started\n");
 	}
-	
-	public void serverStopped()
-	{
-		 status.setText("Stopped");
-	     status.setForeground(Color.RED);
-	     log.append("Server stopped accepting new clients - press Listen to start accepting new clients\n");
+
+	public void serverStopped() {
+		status.setText("Stopped");
+		status.setForeground(Color.RED);
+		log.append("Server stopped accepting new clients - press Listen to start accepting new clients\n");
 	}
-	
-	public void serverClosed()
-	{
+
+	public void serverClosed() {
 		running = false;
 		status.setText("Close");
-	    status.setForeground(Color.RED);
-	    log.append("Server and all current clients are closed - press Listen to restart\n");
+		status.setForeground(Color.RED);
+		log.append("Server and all current clients are closed - press Listen to restart\n");
 	}
-	
-	public void clientConnected(ConnectionToClient client)
-	{
+
+	public void clientConnected(ConnectionToClient client) {
 		log.append("Client " + client.getId() + " connected\n");
 	}
-	
-	public void handleMessageFromClient(Object arg0, ConnectionToClient arg1)
-	{
+
+	public void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 		// If we received LoginData, verify the account information.
-	    if (arg0 instanceof LoginData)
-	    {
-	      // Check the username and password with the database.
-	      LoginData data = (LoginData)arg0;
-	      Object result;
-	      if (database.verifyAccount(data.getUsername(), data.getPassword()))
-	      {
-	        result = "LoginSuccessful";
-	        log.append("Client " + arg1.getId() + " successfully logged in as " + data.getUsername() + "\n");
-	      }
-	      else
-	      {
-	        result = new Error("The username and password are incorrect.", "Login");
-	        log.append("Client " + arg1.getId() + " failed to log in\n");
-	      }
-	      
-	      // Send the result to the client.
-	      try
-	      {
-	        arg1.sendToClient(result);
-	      }
-	      catch (IOException e)
-	      {
-	    	System.out.println("Failed");
-	        return;
-	      }
-	    }
-	    
-	 // If we received CreateAccountData, create a new account.
-	    else if (arg0 instanceof CreateAccountData)
-	    {
-	      // Try to create the account.
-	      CreateAccountData data = (CreateAccountData)arg0;
-	      Object result;
-	      if (database.createNewAccount(data.getUsername(), data.getPassword()))
-	      {
-	        result = "CreateAccountSuccessful";
-	        log.append("Client " + arg1.getId() + " created a new account called " + data.getUsername() + "\n");
-	      }
-	      else
-	      {
-	        result = new Error("The username is already in use.", "CreateAccount");
-	        log.append("Client " + arg1.getId() + " failed to create a new account\n");
-	      }
-	      
-	      // Send the result to the client.
-	      try
-	      {
-	        arg1.sendToClient(result);
-	      }
-	      catch (IOException e)
-	      {
-	        return;
-	      }
-	    }
-	    else if (arg0 instanceof StartGameData)
-	    {
-	    	StartGameData data = (StartGameData)arg0;
-	    	GameData gameData;
-	    	
-	    	if (data.getStart()) 
-	    	{
-	    		GameServerControl gameServerControl = new GameServerControl(data);
-	    		gameServerControl.startGame(data.getUsername());
-	    	}
-	    }
-	    else if (arg0 instanceof BetData)
-	    {
-	    	BetData data = (BetData)arg0;
-	    }
-	    else if (arg0 instanceof CallData)
-	    {
-	    	CallData data = (CallData)arg0;
-	    }
-	    else if (arg0 instanceof Card)
-	    {
-	    	Card card = (Card)arg0;
-	    }
-	    else if (arg0 instanceof CheckData)
-	    {
-	    	CheckData data = (CheckData)arg0;
-	    }
-	    else if (arg0 instanceof Deck)
-	    {
-	    	Deck data = (Deck)arg0;
-	    }
-	    else if (arg0 instanceof RecordScoreData)
-	    {
-	    	RecordScoreData data = (RecordScoreData)arg0;
-	    }
-	    else if (arg0 instanceof Error)
-	    {
-	    	Error data = (Error)arg0;
-	    }
-	    else if (arg0 instanceof FoldData)
-	    {
-	    	FoldData data = (FoldData)arg0;
-	    }
-	    else if (arg0 instanceof GameData)
-	    {
-	    	GameData data = (GameData)arg0;
-	    }
-	    else if (arg0 instanceof Hand)
-	    {
-	    	Hand data = (Hand)arg0;
-	    }
-	    else if (arg0 instanceof RaiseData)
-	    {
-	    	RaiseData data = (RaiseData)arg0;
-	    }
+		if (arg0 instanceof LoginData) {
+			// Check the username and password with the database.
+			LoginData data = (LoginData) arg0;
+			Object result;
+			if (database.verifyAccount(data.getUsername(), data.getPassword())) {
+				result = "LoginSuccessful";
+				log.append("Client " + arg1.getId() + " successfully logged in as " + data.getUsername() + "\n");
+			} else {
+				result = new Error("The username and password are incorrect.", "Login");
+				log.append("Client " + arg1.getId() + " failed to log in\n");
+			}
+
+			// Send the result to the client.
+			try {
+				arg1.sendToClient(result);
+			} catch (IOException e) {
+				System.out.println("Failed");
+				return;
+			}
+		}
+
+		// If we received CreateAccountData, create a new account.
+		else if (arg0 instanceof CreateAccountData) {
+			// Try to create the account.
+			CreateAccountData data = (CreateAccountData) arg0;
+			Object result;
+			if (database.createNewAccount(data.getUsername(), data.getPassword())) {
+				result = "CreateAccountSuccessful";
+				log.append("Client " + arg1.getId() + " created a new account called " + data.getUsername() + "\n");
+			} else {
+				result = new Error("The username is already in use.", "CreateAccount");
+				log.append("Client " + arg1.getId() + " failed to create a new account\n");
+			}
+
+			// Send the result to the client.
+			try {
+				arg1.sendToClient(result);
+			} catch (IOException e) {
+				return;
+			}
+		} else if (arg0 instanceof StartGameData) {
+			StartGameData data = (StartGameData) arg0;
+			GameData gameData;
+
+			if (data.getStart()) {
+				GameServerControl gameServerControl = new GameServerControl(arg1);
+				gameData = gameServerControl.startGame(data.getUsername());
+
+				try {
+					arg1.sendToClient(gameData);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				GameServerControl gameServerControl = new GameServerControl(arg1);
+				gameData = gameServerControl.joinGame(data.getUsername());
+
+				try {
+					arg1.sendToClient(gameData);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		} 
+		else if (arg0 instanceof BetData) 
+		{
+			BetData data = (BetData)arg0;
+			GameData gameData;
+			
+			int currentBet = data.getBetAmount();
+			GameServerControl gameServerControl = new GameServerControl(arg1);
+			gameData = gameServerControl.updateCurrentBet(currentBet);
+			
+			//try {
+			//	arg1.sendToClient(gameData);
+			//} catch (IOException e) {
+			//	// TODO Auto-generated catch block
+			//	e.printStackTrace();
+			//}
+			
+			sendToAllClients(gameData);
+		}
+		else if (arg0 instanceof CallData) 
+		{
+			CallData data = (CallData) arg0;
+		}
+		else if (arg0 instanceof Card) 
+		{
+			Card card = (Card) arg0;
+		} 
+		else if (arg0 instanceof CheckData) 
+		{
+			CheckData data = (CheckData) arg0;
+		} 
+		else if (arg0 instanceof Deck) 
+		{
+			Deck data = (Deck) arg0;
+		} 
+		else if (arg0 instanceof RecordScoreData) 
+		{
+			RecordScoreData data = (RecordScoreData) arg0;
+		} 
+		else if (arg0 instanceof Error) 
+		{
+			Error data = (Error) arg0;
+		} 
+		else if (arg0 instanceof FoldData) 
+		{
+			FoldData data = (FoldData) arg0;
+		} 
+		else if (arg0 instanceof GameData) 
+		{
+			GameData data = (GameData) arg0;
+		} 
+		else if (arg0 instanceof Hand) 
+		{
+			Hand data = (Hand) arg0;
+		} 
+		else if (arg0 instanceof RaiseData) 
+		{
+			RaiseData data = (RaiseData) arg0;
+			GameData gameData;
+
+			GameServerControl gameServerControl = new GameServerControl(arg1);
+			gameData = gameServerControl.updatePot();
+
+			/*
+			 * for (Map.Entry<Integer, GameData> entry :
+			 * gameServerControl.getMap().entrySet()) { try {
+			 * entry.getKey().sendToClient(entry.getValue()); } catch (IOException e) { //
+			 * TODO Auto-generated catch block e.printStackTrace(); } }
+			 */
+			sendToAllClients(gameData);
+
+		}
 	}
-	
-	public void listeningException(Throwable exception)
-	{
+
+	public void listeningException(Throwable exception) {
 		running = false;
 		status.setText("Exception occurred while listening");
-	    status.setForeground(Color.RED);
-	    log.append("Listening exception: " + exception.getMessage() + "\n");
-	    log.append("Press Listen to restart server\n");
+		status.setForeground(Color.RED);
+		log.append("Listening exception: " + exception.getMessage() + "\n");
+		log.append("Press Listen to restart server\n");
 	}
+
 }

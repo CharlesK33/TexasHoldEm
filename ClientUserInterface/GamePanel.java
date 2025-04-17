@@ -1,7 +1,11 @@
 package ClientUserInterface;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 
 public class GamePanel extends JPanel
@@ -10,6 +14,7 @@ public class GamePanel extends JPanel
 	private JLabel scoreLabel;
 	private JLabel potLabel;
 	private JLabel currentBet;
+	private JLabel playerBet;
 	private JButton checkButton;
 	private JButton betButton;
 	private JButton raiseButton;
@@ -25,7 +30,7 @@ public class GamePanel extends JPanel
 		
 		// Game screen partitions
 		JPanel north = new JPanel();
-		north.setPreferredSize(new Dimension(600, 300));
+		//north.setPreferredSize(new Dimension(600, 300));
 		JPanel east = new JPanel();
 		JPanel center = new JPanel();
 		JPanel west = new JPanel();
@@ -33,11 +38,19 @@ public class GamePanel extends JPanel
 		JPanel south = new JPanel();
 		
 		// Player information (south partition)
+		JPanel cardPanel = new JPanel();
+		cardPanel.setBackground(new Color(30, 92, 58));
+		ImageIcon image1 = new ImageIcon("images/ace_of_spades.png");
+		JLabel card1 = new JLabel(image1);
+		ImageIcon image2 = new ImageIcon("images/ace_of_clubs.png");
+		JLabel card2 = new JLabel(image2);
+		cardPanel.add(card1);
+		cardPanel.add(card2);
 		JPanel playerPanel = new JPanel(new GridLayout(2, 1, 5, 5));
-		usernameLabel = new JLabel("ExampleUser", JLabel.CENTER);
+		usernameLabel = new JLabel("", JLabel.CENTER);
 		usernameLabel.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 		usernameLabel.setForeground(new Color(255, 215, 0));
-		scoreLabel = new JLabel("100", JLabel.CENTER);
+		scoreLabel = new JLabel("", JLabel.CENTER);
 		scoreLabel.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 		scoreLabel.setForeground(new Color(255, 215, 0));
 		playerPanel.add(usernameLabel);
@@ -54,7 +67,7 @@ public class GamePanel extends JPanel
         JLabel descriptionLabel2 = new JLabel("Bet Amount: ");
         descriptionLabel2.setFont(new Font("Times New Roman", Font.PLAIN, 40));
         descriptionLabel2.setForeground(new Color(255, 215, 0));
-		currentBet = new JLabel("10");
+		currentBet = new JLabel("0");
 		currentBet.setFont(new Font("Times New Roman", Font.PLAIN, 40));
         currentBet.setForeground(new Color(255, 215, 0));
         betInfoPanel.add(descriptionLabel1);
@@ -63,15 +76,29 @@ public class GamePanel extends JPanel
 		betInfoPanel.add(currentBet);
 		
 		// Buttons (east partition)
-		JPanel buttonPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+		JPanel buttonPanel = new JPanel(new GridLayout(5, 2, 5, 5));
 		checkButton = new JButton("Check");
+		checkButton.addActionListener(gc);
 		betButton = new JButton("Bet");
+		betButton.addActionListener(gc);
 		raiseButton = new JButton("Raise");
+		raiseButton.addActionListener(gc);
 		callButton = new JButton("Call");
+		callButton.addActionListener(gc);
 		foldButton = new JButton("Fold");
+		foldButton.addActionListener(gc);
 		increaseButton = new JButton("Increase +");
+		increaseButton.addActionListener(gc);
 		decreaseButton = new JButton("Decrease -");
+		decreaseButton.addActionListener(gc);
 		enterButton = new JButton("Enter");
+		enterButton.addActionListener(gc);
+		JLabel playerBetLabel = new JLabel("Bet Amount: ");
+		playerBetLabel.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+		playerBetLabel.setForeground(new Color(255, 215, 0));
+		playerBet = new JLabel("");
+		playerBet.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+		playerBet.setForeground(new Color(255, 215, 0));
 		buttonPanel.add(checkButton);
 		buttonPanel.add(foldButton);
 		buttonPanel.add(callButton);
@@ -80,10 +107,16 @@ public class GamePanel extends JPanel
 		buttonPanel.add(increaseButton);
 		buttonPanel.add(decreaseButton);
 		buttonPanel.add(enterButton);
+		buttonPanel.add(playerBetLabel);
+		buttonPanel.add(playerBet);
 		
 		// Game Screen
 		JPanel border = new JPanel(new BorderLayout());
-		south.add(playerPanel);
+		JPanel southBorder = new JPanel(new BorderLayout());
+		southBorder.add(cardPanel, BorderLayout.NORTH);
+		southBorder.add(playerPanel, BorderLayout.SOUTH);
+		//southBorder.setPreferredSize(new Dimension(1200,200));
+		south.add(southBorder);
 		center.add(betInfoPanel);
 		east.add(buttonPanel);
 		
@@ -106,24 +139,44 @@ public class GamePanel extends JPanel
 				
 	}
 	
-	public void setUsernameLabel()
+	public void setUsernameLabel(String username)
 	{
-		
+		usernameLabel.setText(username);
 	}
 	
-	public void setScoreLabel()
+	public void setScoreLabel(int score)
 	{
-		
+		scoreLabel.setText(Integer.toString(score));
 	}
 	
-	public void setPotLabel()
+	public void setPotLabel(int pot)
 	{
-		
+		potLabel.setText(Integer.toString(pot));
 	}
 	
-	public void setCurrentBetLabel()
+	public void setCurrentBetLabel(int bet)
 	{
-		
+		currentBet.setText(Integer.toString(bet));
+	}
+	
+	public void setPlayerBetLabel(int bet)
+	{
+		playerBet.setText(Integer.toString(bet));
+	}
+	
+	public int getPlayerBetAmt()
+	{
+		return Integer.parseInt(playerBet.getText());
+	}
+	
+	public int getCurrentBet()
+	{
+		return Integer.parseInt(currentBet.getText());
+	}
+	
+	public String getUsername()
+	{
+		return usernameLabel.getText();
 	}
 	
 }

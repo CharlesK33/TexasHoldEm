@@ -1,5 +1,8 @@
 package CardGameData;
 
-public class RaiseData {
+import java.io.Serializable;
 
+public class RaiseData implements Serializable
+{
+	
 }

@@ -1,21 +1,28 @@
 package ServerCommunication;
 
 import java.util.HashMap;
+import java.util.Map;
+
 import CardGameData.*;
+import ocsf.server.ConnectionToClient;
+
 import javax.swing.*;
 
 public class GameServerControl 
 {
 	//driver for server-side game control
 	private HashMap<Integer, GameData> playerData;
-	private Object arg;
-	private JLabel playerScoreLabel;
-	private JLabel usernameLabel;
 	private GameData gameData;
+	private ConnectionToClient client;
 	
-	public GameServerControl(Object arg)
+	public GameServerControl(ConnectionToClient client)
 	{
-		this.arg = arg;
+		this.client = client;
+	}
+	
+	public HashMap<Integer, GameData> getMap()
+	{
+		return playerData;
 	}
 	
 	public void processGameData()
@@ -23,9 +30,10 @@ public class GameServerControl
 		
 	}
 	
-	public void updateGameData()
+	public GameData updateGameData(String username, int score, int pot, int currentBet, boolean start)
 	{
-		
+		gameData = new GameData();
+		return gameData;
 	}
 	
 	public void startHand()
@@ -35,10 +43,21 @@ public class GameServerControl
 	
 	public GameData startGame(String username)
 	{
-		playerScoreLabel = new JLabel("100");
-		usernameLabel = new JLabel(username);
 		gameData = new GameData();
-		gameData.setScore();
+		gameData.setScore(100);
+		gameData.setUsername(username);
+		gameData.setStart(true);
+		//playerData.put((int)client.getId(), gameData);
+		return gameData;
+	}
+	
+	
+	public GameData joinGame(String username)
+	{
+		gameData = new GameData();
+		gameData.setScore(100);
+		gameData.setUsername(username);
+		gameData.setStart(false);
 		return gameData;
 	}
 	
@@ -62,19 +81,23 @@ public class GameServerControl
 		
 	}
 	
-	public void takeBet()
+	public int takeBet(int bet)
 	{
-		
+		return bet;
 	}
 	
-	public void updatePot()
+	public GameData updatePot()
 	{
-		
+		gameData = new GameData();
+		gameData.setPot(1500);
+		return gameData;
 	}
 	
-	public void updateCurrentBet()
+	public GameData updateCurrentBet(int currentBet)
 	{
-		
+		gameData = new GameData();
+		gameData.setCurrentBet(currentBet);
+		return gameData;
 	}
 	
 	public void updateTurn()

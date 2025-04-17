@@ -1,6 +1,8 @@
 package CardGameData;
 
-public class StartGameData 
+import java.io.Serializable;
+
+public class StartGameData implements Serializable
 {
 	private String username;
 	private boolean start;
