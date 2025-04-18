@@ -8,6 +8,7 @@ private int score;
 private int pot;
 private int currentBet;
 private boolean start;
+private Hand hand;
 
 public String getUsername() {
 	return username;
@@ -43,5 +44,17 @@ public boolean getStart()
 {
 	return start;
 }
+
+
+public void setHand(Hand hand) 
+{
+	this.hand = hand; 
+	
+}
+public Hand getHand() 
+{ 
+	return hand; 
+}
+
 
 }

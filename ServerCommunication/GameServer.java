@@ -15,7 +15,9 @@ public class GameServer extends AbstractServer {
 	private Database database = new Database();
 	private boolean running;
 	private ArrayList<String> players = new ArrayList<String>();
-	private GameServerControl gameServerControl;
+	private GameServerControl gameServerControl = new GameServerControl();
+	
+	//Track client to username mappings
 	private Map<ConnectionToClient, String> clientToUsername = new HashMap<>();
 
 
@@ -70,14 +72,12 @@ public class GameServer extends AbstractServer {
 		log.append("Client " + client.getId() + " connected\n");
 	}
 
+	
+	
+
 	public void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
 		// If we received LoginData, verify the account information.
 		if (arg0 instanceof LoginData) {
-			
-			
-	
-
-			
 			
 			// Check the username and password with the database.
 			LoginData data = (LoginData) arg0;
@@ -118,6 +118,10 @@ public class GameServer extends AbstractServer {
 			} catch (IOException e) {
 				return;
 			}
+			
+			
+			
+			
 		} else if (arg0 instanceof StartGameData) {
 		    StartGameData data = (StartGameData) arg0;
 
@@ -125,14 +129,13 @@ public class GameServer extends AbstractServer {
 		        gameServerControl = new GameServerControl();
 		    }
 
-		    clientToUsername.put(arg1, data.getUsername());
-		    gameServerControl.addPlayer(data.getUsername());
+		    clientToUsername.put(arg1, data.getUsername());		//Track player
+		    gameServerControl.addPlayer(data.getUsername());	// Add to shared session
+		    gameServerControl.dealHoleCards();
 
-		    GameData gameData = new GameData();
-		    gameData.setUsername(data.getUsername());
-		    gameData.setCurrentBet(gameServerControl.getCurrentBet());
-		    gameData.setScore(gameServerControl.getPot());
-		    gameData.setStart(true); // still triggers GamePanel
+		    GameData gameData = gameServerControl.getGameDataForPlayer(data.getUsername());
+		    gameData.setStart(true); // to trigger game panel switch
+
 
 		    try {
 		        arg1.sendToClient(gameData);
@@ -220,6 +223,7 @@ public class GameServer extends AbstractServer {
 	
 	
 	//Sends the current game state to all clients
+	//Updated to send player-specific data
 	public void broadcastGameState() {
 	    if (gameServerControl == null) return;
 
@@ -228,16 +232,20 @@ public class GameServer extends AbstractServer {
 	        GameData data = gameServerControl.getGameDataForPlayer(username);
 	        try {
 	            client.sendToClient(data);
+	            log.append("Sent GameData to " + username + "\n");
 	        } catch (IOException e) {
-	            log.append("Failed to send game state to " + username + "\n");
+	            log.append("Failed to send game state to " + username + ": " + e.getMessage() + "\n");
+	            e.printStackTrace(); // show detailed error
+	        
 	        }
 	    }
-	    
-	    
+
 	    
 	}
 	
 	
+	
+	//Get username of client's player
 	public String getClientUsername(ConnectionToClient client) {
 	    return clientToUsername.getOrDefault(client, "Unknown");
 	}

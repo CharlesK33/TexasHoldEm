@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import ClientCommunication.*;
 import CardGameData.*;
@@ -100,23 +101,52 @@ public class GameControl implements ActionListener
 		
 	}
 	
-	public void updatePanel(GameData gameData)
-	{
-		GamePanel gamePanel = (GamePanel)container.getComponent(4);
-		
-		if (gameData.getScore() != 0)
-		{
-			gamePanel.setScoreLabel(gameData.getScore());
-		}
-		
-		if (gameData.getUsername() != "" && gamePanel.getUsername() == "")
-		{
-			gamePanel.setUsernameLabel(gameData.getUsername());
-		}
-		
-		if (gameData.getCurrentBet() != gamePanel.getCurrentBet())
-		{
-			gamePanel.setCurrentBetLabel(gameData.getCurrentBet());
-		}
+	
+	public void updatePanel(GameData gameData) {
+	   
+
+	    GamePanel gamePanel = (GamePanel) container.getComponent(4);
+
+	    // Score update
+	    
+	    if (gameData.getScore() != 0) {
+	        gamePanel.setScoreLabel(gameData.getScore());
+	    }
+
+	    // Username update
+	 
+	    if (!gameData.getUsername().equals("") && gamePanel.getUsername().equals("")) {
+	        gamePanel.setUsernameLabel(gameData.getUsername());
+	    }
+
+	    // Bet update
+	   
+	    if (gameData.getCurrentBet() != gamePanel.getCurrentBet()) {
+	        gamePanel.setCurrentBetLabel(gameData.getCurrentBet());
+	    }
+
+	    // Hand + Card debug
+	    Hand hand = gameData.getHand();
+	    ArrayList<Card> cards = hand.getHand();
+	    if (cards == null || cards.size() < 2) {
+	        System.out.println("Cards are missing or fewer than 2. Size: " + (cards == null ? "null" : cards.size()));
+	        return;
+	    }
+
+	    Card card1 = cards.get(0);
+	    Card card2 = cards.get(1);
+
+	    if (card1 == null || card2 == null) {
+	        System.out.println("One or both cards are null: " + card1 + ", " + card2);
+	        return;
+	    }
+
+	    System.out.println("Setting images: " + card1.getFileName() + ", " + card2.getFileName());
+
+	    gamePanel.setCardImages(card1, card2);
 	}
+
+	
+
+
 }

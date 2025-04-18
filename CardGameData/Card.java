@@ -1,6 +1,13 @@
 package CardGameData;
 
-public class Card {
+
+import java.io.Serializable;
+
+public class Card implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+
+
 
     public enum Suit {
         CLUBS("clubs"),
@@ -70,4 +77,9 @@ public class Card {
     public String toString() {
         return value.getValue() + " of " + suit.getCardValue();
     }
+    
+    public String getFileName() {
+        return value.getValue() + "_of_" + suit.getCardValue() + ".png";
+    }
+
 }

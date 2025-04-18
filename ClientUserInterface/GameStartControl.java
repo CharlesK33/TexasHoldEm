@@ -34,6 +34,7 @@ public class GameStartControl implements ActionListener
 			StartGameData startGameData = new StartGameData(username, start);
 			
 			try {
+				client.openConnection();
 				client.sendToServer(startGameData);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

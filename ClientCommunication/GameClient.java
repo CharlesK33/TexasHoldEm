@@ -40,6 +40,9 @@ public class GameClient extends AbstractClient
 	
 	public void handleMessageFromServer(Object arg0)
 	{
+		
+		
+		
 		// If we received a String, figure out what this event is.
 	    if (arg0 instanceof String)
 	    {
@@ -84,10 +87,6 @@ public class GameClient extends AbstractClient
 	    	if (gameData.getStart())
 	    	{
 	    		gsc.startGame();
-	    	}
-	    	else if(!gameData.getStart())
-	    	{
-	    		
 	    	}
 	  
 	    	gc.updatePanel(gameData);

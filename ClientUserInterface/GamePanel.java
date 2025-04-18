@@ -2,6 +2,9 @@ package ClientUserInterface;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import CardGameData.Card;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -23,11 +26,13 @@ public class GamePanel extends JPanel
 	private JButton increaseButton;
 	private JButton decreaseButton;
 	private JButton enterButton;
+	private JLabel card1;
+	private JLabel card2;
+
 	
 	public GamePanel(GameControl gc)
 	{
 		this.setLayout(new BorderLayout());
-		
 		// Game screen partitions
 		JPanel north = new JPanel();
 		//north.setPreferredSize(new Dimension(600, 300));
@@ -40,10 +45,8 @@ public class GamePanel extends JPanel
 		// Player information (south partition)
 		JPanel cardPanel = new JPanel();
 		cardPanel.setBackground(new Color(30, 92, 58));
-		ImageIcon image1 = new ImageIcon("images/ace_of_spades.png");
-		JLabel card1 = new JLabel(image1);
-		ImageIcon image2 = new ImageIcon("images/ace_of_clubs.png");
-		JLabel card2 = new JLabel(image2);
+		card1 = new JLabel();
+		card2 = new JLabel();
 		cardPanel.add(card1);
 		cardPanel.add(card2);
 		JPanel playerPanel = new JPanel(new GridLayout(2, 1, 5, 5));
@@ -186,5 +189,23 @@ public class GamePanel extends JPanel
 	{
 		return usernameLabel.getText();
 	}
+	
+	public void setCardImages(Card card1Obj, Card card2Obj) {
+		
+		String path1 = "images/" + card1Obj.getFileName();
+		String path2 = "images/" + card2Obj.getFileName();
+
+		File f1 = new File(path1);
+		File f2 = new File(path2);
+
+		
+
+		ImageIcon image1 = new ImageIcon(path1);
+		ImageIcon image2 = new ImageIcon(path2);
+
+		card1.setIcon(image1);
+		card2.setIcon(image2);
+	}
+
 	
 }

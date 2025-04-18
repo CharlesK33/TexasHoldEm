@@ -137,10 +137,23 @@ public class GameServerControl {
     }
 
     public GameData getGameDataForPlayer(String username) {
+    	
         GameData data = new GameData();
+        
+        Hand playerHand = hands.get(username);
+        
+        if (playerHand == null) {
+            System.out.println("⚠️ WARNING: No hand found for user " + username);
+        }
+
+        
+        data.setHand(playerHand); 
         data.setUsername(username);
         data.setCurrentBet(currentBet);
         data.setScore(pot);
+        data.setStart(true);
+        
+        //data.setHand(hands.get(username));
         return data;
     }
     
