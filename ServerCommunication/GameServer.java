@@ -130,20 +130,33 @@ public class GameServer extends AbstractServer {
 		    }
 
 		    clientToUsername.put(arg1, data.getUsername());		//Track player
-		    gameServerControl.addPlayer(data.getUsername());	// Add to shared session
+		    gameServerControl.addPlayer(data.getUsername());	//Add to shared session
 		    gameServerControl.dealHoleCards();
+		    
+
+
+
+		    clientToUsername.put(arg1, data.getUsername()); // rack player
+		    gameServerControl.addPlayer(data.getUsername());
+
+		    // Only deal hole cards and flop if game hasn't started yet
+		    if (!gameServerControl.hasGameStarted()) {
+		        gameServerControl.dealHoleCards();
+		        gameServerControl.dealFlop();
+		        gameServerControl.setGameStarted(true); // Prevents future re-deals
+		        log.append("Game started by " + data.getUsername() + "\n");
+		    } else {
+		        log.append("Player joined: " + data.getUsername() + "\n");
+		    }
 
 		    GameData gameData = gameServerControl.getGameDataForPlayer(data.getUsername());
-		    gameData.setStart(true); // to trigger game panel switch
-
+		    gameData.setStart(true); //Triggers GamePanel on client
 
 		    try {
 		        arg1.sendToClient(gameData);
 		    } catch (IOException e) {
 		        log.append("Failed to send GameData to " + data.getUsername() + "\n");
 		    }
-
-		    log.append((data.getStart() ? "Game started by " : "Player joined: ") + data.getUsername() + "\n");
 
 		    broadcastGameState();
 		}

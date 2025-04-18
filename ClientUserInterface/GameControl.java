@@ -140,6 +140,12 @@ public class GameControl implements ActionListener
 	        System.out.println("One or both cards are null: " + card1 + ", " + card2);
 	        return;
 	    }
+	    
+	    ArrayList<Card> board = gameData.getBoard();
+	    if (board != null) {
+	        gamePanel.setCommunityCards(board);
+	    }
+
 
 	    System.out.println("Setting images: " + card1.getFileName() + ", " + card2.getFileName());
 

@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class GamePanel extends JPanel
@@ -28,6 +29,8 @@ public class GamePanel extends JPanel
 	private JButton enterButton;
 	private JLabel card1;
 	private JLabel card2;
+	private JLabel flop1, flop2, flop3, turn, river;
+
 
 	
 	public GamePanel(GameControl gc)
@@ -139,6 +142,25 @@ public class GamePanel extends JPanel
 		border.add(west, BorderLayout.WEST);
 		
 		this.add(border);
+		
+		
+		//Community cards (north partition)
+		JPanel communityPanel = new JPanel();
+		communityPanel.setBackground(new Color(30, 92, 58));
+		flop1 = new JLabel();
+		flop2 = new JLabel();
+		flop3 = new JLabel();
+		turn = new JLabel();
+		river = new JLabel();
+		communityPanel.add(flop1);
+		communityPanel.add(flop2);
+		communityPanel.add(flop3);
+		communityPanel.add(turn);
+		communityPanel.add(river);
+
+		
+		north.add(communityPanel);
+
 				
 	}
 	
@@ -206,6 +228,18 @@ public class GamePanel extends JPanel
 		card1.setIcon(image1);
 		card2.setIcon(image2);
 	}
+	
+	public void setCommunityCards(ArrayList<Card> board) {
+	    JLabel[] labels = {flop1, flop2, flop3, turn, river};
+	    for (int i = 0; i < 5; i++) {
+	        if (i < board.size()) {
+	            labels[i].setIcon(new ImageIcon("images/" + board.get(i).getFileName()));
+	        } else {
+	            labels[i].setIcon(null); // Clear if not yet dealt
+	        }
+	    }
+	}
+
 
 	
 }

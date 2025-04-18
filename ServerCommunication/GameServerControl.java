@@ -18,6 +18,7 @@ public class GameServerControl {
     private int currentBet;
     private int currentPlayerIndex;
     private GamePhase phase;
+    private boolean gameStarted = false;
 
     public enum GamePhase {
         PRE_FLOP, FLOP, TURN, RIVER, SHOWDOWN
@@ -139,6 +140,8 @@ public class GameServerControl {
     public GameData getGameDataForPlayer(String username) {
     	
         GameData data = new GameData();
+        data.setBoard(new ArrayList<>(board));
+
         
         Hand playerHand = hands.get(username);
         
@@ -188,6 +191,14 @@ public class GameServerControl {
 
     public int getPot() {
         return pot;
+    }
+    
+    public boolean hasGameStarted() {
+        return gameStarted;
+    }
+
+    public void setGameStarted(boolean started) {
+        this.gameStarted = started;
     }
 
 
