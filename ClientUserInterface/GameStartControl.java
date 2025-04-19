@@ -22,6 +22,49 @@ public class GameStartControl implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         System.out.println("🧠 Client connected? " + client.isConnected());
+        
+        String command = ae.getActionCommand();
+        
+        LoginPanel loginPanel = (LoginPanel) container.getComponent(1);
+        String username = loginPanel.getUsername();
+        
+        WaitingRoomControl wrc = client.getWaitingRoomControl();
+        wrc.setUsername(username);
+        
+        
+        if (command.equals("Start Game"))
+        {
+        	StartGameData startGameData = new StartGameData(username, true);
+        	
+        	try {
+                System.out.println("🔌 Sending StartGameData...");
+                client.sendToServer(startGameData);
+
+                // Delay slightly to ensure registration before UI flips
+                Thread.sleep(100);
+
+                //enterWaitingRoom();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (command.equals("Join Game"))
+        {
+        	StartGameData startGameData = new StartGameData(username, false);
+        	
+        	try {
+                System.out.println("🔌 Sending StartGameData...");
+                client.sendToServer(startGameData);
+
+                // Delay slightly to ensure registration before UI flips
+                Thread.sleep(100); 
+
+                //enterWaitingRoom();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        
 
         if (alreadySentStart) {
             System.out.println("⛔ StartGameData already sent — ignoring duplicate click");
@@ -29,27 +72,6 @@ public class GameStartControl implements ActionListener {
         }
 
         alreadySentStart = true;
-
-        String command = ae.getActionCommand();
-        LoginPanel loginPanel = (LoginPanel) container.getComponent(1);
-        String username = loginPanel.getUsername();
-
-        WaitingRoomControl wrc = client.getWaitingRoomControl();
-        wrc.setUsername(username);
-        StartGameData startGameData = new StartGameData(username, false);
-
-        try {
-            System.out.println("🔌 Sending StartGameData...");
-            client.sendToServer(startGameData);
-
-            // Delay slightly to ensure registration before UI flips
-            Thread.sleep(100); 
-
-            CardLayout cardLayout = (CardLayout) container.getLayout();
-            cardLayout.show(container, "6");
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
         
         System.out.println("🟢 UI-triggered GameClient: " + client);
 
@@ -58,6 +80,12 @@ public class GameStartControl implements ActionListener {
     public void startGame() {
         CardLayout cardLayout = (CardLayout) container.getLayout();
         cardLayout.show(container, "5");
+    }
+    
+    public void enterWaitingRoom()
+    {
+    	CardLayout cardLayout = (CardLayout)container.getLayout();
+    	cardLayout.show(container, "6");
     }
 
     public void displayError(String error) {

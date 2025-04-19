@@ -34,7 +34,6 @@ public class ClientGUI extends JFrame
         CreateAccountControl cac = new CreateAccountControl(container, this.client);
         GameStartControl gsc = new GameStartControl(container, this.client);
         WaitingRoomControl wrc = new WaitingRoomControl(container, this.client, "");
-        WaitingRoomPanel wrp = new WaitingRoomPanel(wrc);
 
         this.client.setLoginControl(lc);
         this.client.setCreateAccountControl(cac);
@@ -47,7 +46,7 @@ public class ClientGUI extends JFrame
         JPanel view3 = new CreateAccountPanel(cac);
         JPanel view4 = new GameStartPanel(gsc);
         JPanel view5 = new GamePanel(gc);
-        JPanel view6 = wrp;
+        JPanel view6 = new WaitingRoomPanel(wrc);
 
         container.add(view1, "1");
         container.add(view2, "2");

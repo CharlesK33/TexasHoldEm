@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.List;
+import CardGameData.*;
 
 import javax.swing.JPanel;
 
@@ -16,6 +17,7 @@ public class WaitingRoomControl implements ActionListener
     private JPanel container;
     private GameClient client;
     private String username;
+    private JPanel waitingRoom;
 
     public WaitingRoomControl(JPanel container, GameClient client, String username) 
     {
@@ -33,6 +35,37 @@ public class WaitingRoomControl implements ActionListener
         System.out.println("Couldn't find WaitingRoomPanel in container");
         return null;
     }
+    
+    public void updatePanel(LobbyData lobbyData)
+    {
+    	WaitingRoomPanel waitingRoom = (WaitingRoomPanel)container.getComponent(5);
+    	
+    	if (lobbyData.getPlayer1() != null)
+    	{
+    		waitingRoom.setPlayer1Label(lobbyData.getPlayer1());
+    	}
+    	
+    	if (lobbyData.getPlayer2() != null)
+    	{
+    		waitingRoom.setPlayer2Label(lobbyData.getPlayer2());
+    	}
+    	
+    	if (lobbyData.getPlayer3() != null)
+    	{
+    		waitingRoom.setPlayer3Label(lobbyData.getPlayer3());
+    	}
+    	
+    	
+    	if (lobbyData.getPlayer4() != null)
+    	{
+    		waitingRoom.setPlayer4Label(lobbyData.getPlayer4());
+    	}
+    	
+    	if (lobbyData.getPlayer5() != null)
+    	{
+    		waitingRoom.setPlayer5Label(lobbyData.getPlayer5());
+    	}
+    }
 
     public void updatePlayerList(List<String> players) {
         System.out.println("Updating player list: " + players);
@@ -46,7 +79,8 @@ public class WaitingRoomControl implements ActionListener
     }
 
     
-    public void showWaitingRoom() {
+    public void showWaitingRoom() 
+    {
         CardLayout cl = (CardLayout) container.getLayout();
         cl.show(container, "6");
     }
@@ -60,8 +94,7 @@ public class WaitingRoomControl implements ActionListener
         System.out.println("🔍 getUsername() called, returning: " + username);
         return username;
     }
-
-
+    
     public void setAsHost(boolean isHost) {
         WaitingRoomPanel panel = findWaitingRoomPanel();
         if (panel != null) {
@@ -76,7 +109,7 @@ public class WaitingRoomControl implements ActionListener
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("StartGame")) {
+        if (e.getActionCommand().equals("Start Hand")) {
             try {
                 client.sendToServer(new StartGameData(username, true));  // true = now REALLY starting
             } catch (IOException ex) {

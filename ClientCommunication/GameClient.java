@@ -108,7 +108,12 @@ public class GameClient extends AbstractClient
 	    
 	    else if (arg0 instanceof LobbyData) {
 	        LobbyData lobbyData = (LobbyData) arg0;
+	        
+	        wrc.showWaitingRoom();
+	        wrc.updatePanel(lobbyData);
+	        
 
+	        /*
 	        System.out.println("Received LobbyData: " + lobbyData.getPlayers());
 	        System.out.println("Host GameClient instance: " + this);
 
@@ -128,6 +133,7 @@ public class GameClient extends AbstractClient
 	        } else {
 	            System.out.println("STILL NULL. wrc never initialized.");
 	        }
+	        */
 	    }
 	    
 	}

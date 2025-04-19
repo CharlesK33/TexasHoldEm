@@ -62,7 +62,7 @@ public class GameServer extends AbstractServer {
 
         if (username != null) {
             gameServerControl.removePlayer(username);
-            broadcastLobby();
+            //broadcastLobby();
         }
     }
 
@@ -101,57 +101,54 @@ public class GameServer extends AbstractServer {
 
         else if (arg0 instanceof StartGameData data) {
             String username = data.getUsername();
-
-            System.out.println("🧾 StartGameData received:");
-            System.out.println("Username: " + username);
-            System.out.println("Start flag: " + data.getStart());
-
+            
             client.setInfo("username", username);
             gameServerControl.addPlayer(username);
-
-            if (data.getStart()) {
-                System.out.println("🎮 Host starting the full game...");
-                gameServerControl.startFullGame();
-                broadcastLobby();
-
-                for (ConnectionToClient conn : getAllClients()) {
-                    String user = (String) conn.getInfo("username");
-                    if (user == null) continue;
-
-                    GameData gameData = gameServerControl.getGameDataForPlayer(user);
-                    gameData.setStart(true);
-                    gameData.setInGame(true);
-
-                    try {
-                        conn.sendToClient(gameData);
-                        System.out.println("📤 Sent GameData to: " + user);
-                    } catch (IOException e) {
-                        log.append("Failed to send GameData to " + user + "\n");
-                    }
-                }
-            } else {
-                System.out.println("👥 Player " + username + " joined the waiting room.");
-
-                GameData gameData = gameServerControl.getGameDataForPlayer(username);
-                gameData.setStart(false);
-                gameData.setInGame(false);
-
-                try {
-                    client.sendToClient(gameData);
-                    System.out.println("📤 Sent waiting room GameData to " + username);
-                } catch (IOException e) {
-                    log.append("Failed to send GameData to " + username + "\n");
-                }
-
-                LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers());
-                try {
-                    client.sendToClient(lobbyData);
-                    System.out.println("📤 Sent LobbyData to " + username);
-                } catch (IOException e) {
-                    log.append("Failed to send LobbyData to " + username + "\n");
-                }
-
-                broadcastLobby();
+            
+            if (data.getStart()) 
+            {
+            	LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers(), true);
+            	
+            	List<String> players = lobbyData.getPlayers();
+            	
+            	lobbyData.setPlayer1(players.get(0));
+            	
+            	try {
+					client.sendToClient(lobbyData);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+            else if (!data.getStart()) 
+            {
+            	LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers(), false);
+            	
+            	List<String> players = lobbyData.getPlayers();
+            	
+            	lobbyData.setPlayer1(players.get(0));
+            	
+            	if (players.size() > 1)
+            	{
+            		lobbyData.setPlayer2(players.get(1));
+            	}
+            	
+            	if (players.size() > 2)
+            	{
+            		lobbyData.setPlayer3(players.get(2));
+            	}
+            	
+            	if (players.size() > 3)
+            	{
+            		lobbyData.setPlayer4(players.get(3));
+            	}
+            	
+            	if (players.size() > 4)
+            	{
+            		lobbyData.setPlayer5(players.get(4));
+            	}
+            	
+            	sendToAllClients(lobbyData);
             }
         }
 
@@ -198,26 +195,6 @@ public class GameServer extends AbstractServer {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void broadcastLobby() {
-        LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers());
-        System.out.println("📡 Broadcasting to players:");
-
-        for (ConnectionToClient conn : getAllClients()) {
-            String username = getClientUsername(conn);
-            System.out.println("   " + username + " → " + conn);
-
-            if (username != null) {
-                try {
-                    conn.sendToClient(lobbyData);
-                } catch (IOException e) {
-                    log.append("Failed to send to " + username + "\n");
-                }
-            }
-        }
-
-        System.out.println("📢 Player list in lobby broadcast: " + lobbyData.getPlayers());
     }
 
     private List<ConnectionToClient> getAllClients() {
