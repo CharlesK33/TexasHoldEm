@@ -235,7 +235,7 @@ public class GamePanel extends JPanel
 	        if (i < board.size()) {
 	            labels[i].setIcon(new ImageIcon("images/" + board.get(i).getFileName()));
 	        } else {
-	            labels[i].setIcon(null); // Clear if not yet dealt
+	            labels[i].setIcon(null); //Clear if not yet dealt
 	        }
 	    }
 	}

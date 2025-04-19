@@ -2,6 +2,7 @@ package CardGameData;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameData implements Serializable{
 private String username;
@@ -11,6 +12,8 @@ private int currentBet;
 private boolean start;
 private Hand hand;
 private ArrayList<Card> board;
+private boolean inGame;
+private List<String> players;
 
 public String getUsername() {
 	return username;
@@ -67,6 +70,24 @@ public void setBoard(ArrayList<Card> board)
 public ArrayList<Card> getBoard() 
 {
     return board;
+}
+
+public boolean isInGame() 
+{ 
+	return inGame; 
+}
+
+public void setInGame(boolean inGame) 
+{ 
+	this.inGame = inGame; 
+}
+
+public List<String> getPlayers() {
+    return players;
+}
+
+public void setPlayers(List<String> players) {
+    this.players = players;
 }
 
 }

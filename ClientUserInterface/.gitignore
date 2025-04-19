@@ -9,3 +9,5 @@
 /CreateAccountControl.class
 /GameStartPanel.class
 /GameStartControl.class
+/WaitingRoomPanel.class
+/WaitingRoomControl.class

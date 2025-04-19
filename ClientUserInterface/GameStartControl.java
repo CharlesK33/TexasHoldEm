@@ -14,6 +14,8 @@ public class GameStartControl implements ActionListener
 	private JPanel container;
 	private GameClient client;
 	private boolean start;
+	private WaitingRoomControl wrc;
+
 	
 	public GameStartControl(JPanel container, GameClient client)
 	{
@@ -22,40 +24,35 @@ public class GameStartControl implements ActionListener
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent ae)
-	{
-		String command = ae.getActionCommand();
-		
-		if (command.equals("Start Game"))
-		{
-			LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
-			String username = loginPanel.getUsername();
-			start = true;
-			StartGameData startGameData = new StartGameData(username, start);
-			
-			try {
-				client.openConnection();
-				client.sendToServer(startGameData);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else if (command.equals("Join Game"))
-		{
-			LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
-			String username = loginPanel.getUsername();
-			start = false;
-			StartGameData startGameData = new StartGameData(username, start);
-			
-			try {
-				client.sendToServer(startGameData);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	public void actionPerformed(ActionEvent ae) {
+	    String command = ae.getActionCommand();
+	    LoginPanel loginPanel = (LoginPanel) container.getComponent(1);
+	    String username = loginPanel.getUsername();
+
+	    StartGameData startGameData = new StartGameData(username, false); // false = just joining
+
+	    try {
+	        if (command.equals("Start Game")) {
+	            client.openConnection(); // Only host opens connection, fine
+	        }
+
+	        client.sendToServer(startGameData);
+
+	        //Just update username on the already existing WaitingRoomControl
+	        client.getWaitingRoomControl().setUsername(username);
+
+	        //Show waiting room panel (already added in ClientGUI)
+	        CardLayout cardLayout = (CardLayout) container.getLayout();
+	        cardLayout.show(container, "6");
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
 	}
+
+	
+	
+
 	
 	public void startGame()
 	{

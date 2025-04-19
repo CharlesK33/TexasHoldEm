@@ -138,25 +138,13 @@ public class GameServerControl {
     }
 
     public GameData getGameDataForPlayer(String username) {
-    	
         GameData data = new GameData();
         data.setBoard(new ArrayList<>(board));
-
-        
-        Hand playerHand = hands.get(username);
-        
-        if (playerHand == null) {
-            System.out.println("⚠️ WARNING: No hand found for user " + username);
-        }
-
-        
-        data.setHand(playerHand); 
+        data.setHand(hands.get(username));
         data.setUsername(username);
         data.setCurrentBet(currentBet);
         data.setScore(pot);
-        data.setStart(true);
-        
-        //data.setHand(hands.get(username));
+        data.setPlayers(new ArrayList<>(players));
         return data;
     }
     
@@ -185,6 +173,13 @@ public class GameServerControl {
         return data;
     }
     
+    public void startFullGame() {
+        dealHoleCards();
+        dealFlop();
+        setGameStarted(true);
+    }
+
+    
     public int getCurrentBet() {
         return currentBet;
     }
@@ -200,6 +195,12 @@ public class GameServerControl {
     public void setGameStarted(boolean started) {
         this.gameStarted = started;
     }
+    
+    public List<String> getPlayers() 
+    {
+        return players;
+    }
+
 
 
 

@@ -12,6 +12,7 @@ public class GameClient extends AbstractClient
 	private CreateAccountControl cac;
 	private GameStartControl gsc;
 	private GameControl gc;
+	private WaitingRoomControl wrc;
 	
 	public GameClient()
 	{
@@ -36,6 +37,11 @@ public class GameClient extends AbstractClient
 	public void setGameControl(GameControl gc)
 	{
 		this.gc = gc;
+	}
+	
+	public void setWaitingRoomControl(WaitingRoomControl wrc) 
+	{
+	    this.wrc = wrc;
 	}
 	
 	public void handleMessageFromServer(Object arg0)
@@ -81,16 +87,36 @@ public class GameClient extends AbstractClient
 	      }
 	    }
 	    
-	    else if (arg0 instanceof GameData)
-	    {
-	    	GameData gameData = (GameData)arg0;
-	    	if (gameData.getStart())
-	    	{
-	    		gsc.startGame();
-	    	}
-	  
-	    	gc.updatePanel(gameData);
+	    else if (arg0 instanceof GameData) {
+	        GameData gameData = (GameData) arg0;
+	        System.out.println("📬 GameData received from server: start=" + gameData.getStart() + ", inGame=" + gameData.isInGame() + ", user=" + gameData.getUsername());
+
+	        if(gameData.getStart() && gameData.isInGame()) {
+	            gsc.startGame();  // Show GamePanel
+	        } else {
+	            wrc.showWaitingRoom(); // Show waiting room
+	            wrc.updatePlayerList(gameData.getPlayers());
+	        }
+
+	        gc.updatePanel(gameData); // or wrc.updatePanel(gameData) if needed
 	    }
+
+
+	    
+	    else if (arg0 instanceof LobbyData) 
+	    {
+	    	LobbyData lobbyData = (LobbyData) arg0;
+	    	System.out.println("Received LobbyData: " + lobbyData.getPlayers());
+	        wrc.updatePlayerList(lobbyData.getPlayers());
+
+	        // Show Start Game button if player is the host (first in the list)
+	        String myUsername = wrc.getUsername();
+	        if (!lobbyData.getPlayers().isEmpty() && lobbyData.getPlayers().get(0).equals(myUsername)) 
+	        {
+	            wrc.setAsHost(true);
+	        }
+	    }
+
 	    
 	}
 	
@@ -103,4 +129,10 @@ public class GameClient extends AbstractClient
 	{
 		
 	}
+	
+	public WaitingRoomControl getWaitingRoomControl() 
+	{
+	    return wrc;
+	}
+
 }

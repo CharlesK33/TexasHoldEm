@@ -47,6 +47,8 @@ public class GameServer extends AbstractServer {
 	public boolean isRunning() {
 		return running;
 	}
+	
+	
 
 	public void serverStarted() {
 		running = true;
@@ -71,6 +73,8 @@ public class GameServer extends AbstractServer {
 	public void clientConnected(ConnectionToClient client) {
 		log.append("Client " + client.getId() + " connected\n");
 	}
+	
+	
 
 	
 	
@@ -122,44 +126,60 @@ public class GameServer extends AbstractServer {
 			
 			
 			
-		} else if (arg0 instanceof StartGameData) {
+		} 
+		
+		
+		else if (arg0 instanceof StartGameData) {
 		    StartGameData data = (StartGameData) arg0;
-
-		    if (gameServerControl == null) {
-		        gameServerControl = new GameServerControl();
-		    }
-
-		    clientToUsername.put(arg1, data.getUsername());		//Track player
-		    gameServerControl.addPlayer(data.getUsername());	//Add to shared session
-		    gameServerControl.dealHoleCards();
 		    
+		    // 🔥 DEBUG PRINT
+		    System.out.println("📨 StartGameData received:");
+		    System.out.println("   → Username: " + data.getUsername());
+		    System.out.println("   → Start flag: " + data.getStart());
 
-
-
-		    clientToUsername.put(arg1, data.getUsername()); // rack player
+		    clientToUsername.put(arg1, data.getUsername());
 		    gameServerControl.addPlayer(data.getUsername());
 
-		    // Only deal hole cards and flop if game hasn't started yet
-		    if (!gameServerControl.hasGameStarted()) {
-		        gameServerControl.dealHoleCards();
-		        gameServerControl.dealFlop();
-		        gameServerControl.setGameStarted(true); // Prevents future re-deals
-		        log.append("Game started by " + data.getUsername() + "\n");
+		    if (data.getStart()) {
+		        // ✅ Host clicked Start Game
+		        System.out.println("🚀 Starting the full game...");
+
+		        gameServerControl.startFullGame();
+
+		        for (ConnectionToClient client : clientToUsername.keySet()) {
+		            String username = clientToUsername.get(client);
+		            GameData gameData = gameServerControl.getGameDataForPlayer(username);
+		            gameData.setStart(true);    // show GamePanel
+		            gameData.setInGame(true);   // real game now
+
+		            try {
+		                client.sendToClient(gameData);
+		                System.out.println("✅ Sent GameData to: " + username);
+		            } catch (IOException e) {
+		                log.append("Failed to send GameData to " + username + "\n");
+		            }
+		        }
 		    } else {
-		        log.append("Player joined: " + data.getUsername() + "\n");
+		        // Player is just joining the lobby
+		        System.out.println("👥 Player " + data.getUsername() + " joined the waiting room.");
+
+		        GameData gameData = gameServerControl.getGameDataForPlayer(data.getUsername());
+		        gameData.setStart(false);      // show waiting room panel
+		        gameData.setInGame(false);     // not actually playing yet
+
+		        try {
+		            arg1.sendToClient(gameData);
+		            System.out.println("📤 Sent waiting room GameData to " + data.getUsername());
+		        } catch (IOException e) {
+		            log.append("Failed to send GameData to " + data.getUsername() + "\n");
+		        }
+
+		        broadcastLobby();
 		    }
-
-		    GameData gameData = gameServerControl.getGameDataForPlayer(data.getUsername());
-		    gameData.setStart(true); //Triggers GamePanel on client
-
-		    try {
-		        arg1.sendToClient(gameData);
-		    } catch (IOException e) {
-		        log.append("Failed to send GameData to " + data.getUsername() + "\n");
-		    }
-
-		    broadcastGameState();
 		}
+
+
+
 
 		else if (arg0 instanceof BetData) {
 		    BetData data = (BetData) arg0;
@@ -262,6 +282,21 @@ public class GameServer extends AbstractServer {
 	public String getClientUsername(ConnectionToClient client) {
 	    return clientToUsername.getOrDefault(client, "Unknown");
 	}
+	
+	
+	public void broadcastLobby() {
+	    LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers());
+	    for (ConnectionToClient client : clientToUsername.keySet()) {
+	        try {
+	            client.sendToClient(lobbyData);
+	        } catch (IOException e) {
+	            log.append("Failed to send lobby data\n");
+	        }
+	    }
+	}
+	
+	
+
 
 }
 

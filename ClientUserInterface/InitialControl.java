@@ -20,16 +20,15 @@ public class InitialControl implements ActionListener
 		
 		if (command.equals("Login"))
 		{
-			LoginPanel loginPanel = (LoginPanel)container.getComponent(1);
-			//LoginPanel.setError("");
 			CardLayout cardLayout = (CardLayout)container.getLayout();
-			cardLayout.show(container,  "2");
+			cardLayout.show(container,  "2"); // LoginPanel
 		}
 		else if (command.equals("Create"))
 		{
 			CardLayout cardLayout = (CardLayout)container.getLayout();
-			cardLayout.show(container,  "3");
+			cardLayout.show(container,  "3"); // CreateAccountPanel
 		}
 	}
+
 
 }

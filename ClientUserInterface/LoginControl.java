@@ -12,6 +12,7 @@ public class LoginControl implements ActionListener
 {
 	private JPanel container;
 	private GameClient client;
+	private LoginPanel loginPanel;
 	
 	public LoginControl(JPanel container, GameClient client)
 	{
@@ -63,4 +64,11 @@ public class LoginControl implements ActionListener
 		CardLayout cardLayout = (CardLayout)container.getLayout();
 		cardLayout.show(container, "4");
 	}
+	
+	
+
+	public void setLoginPanel(LoginPanel loginPanel) {
+	    this.loginPanel = loginPanel;
+	}
+
 }
