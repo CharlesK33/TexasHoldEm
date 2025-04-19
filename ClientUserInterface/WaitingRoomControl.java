@@ -52,12 +52,15 @@ public class WaitingRoomControl implements ActionListener
     }
     
     public void setUsername(String username) {
+        System.out.println("🟢 Setting username in WRC: " + username);
         this.username = username;
     }
-    
+
     public String getUsername() {
+        System.out.println("🔍 getUsername() called, returning: " + username);
         return username;
     }
+
 
     public void setAsHost(boolean isHost) {
         WaitingRoomPanel panel = findWaitingRoomPanel();

@@ -4,65 +4,63 @@ import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
 import javax.swing.*;
+
 import ClientCommunication.*;
 import CardGameData.*;
 
-public class GameStartControl implements ActionListener
-{
-	private JPanel container;
-	private GameClient client;
-	private boolean start;
-	private WaitingRoomControl wrc;
+public class GameStartControl implements ActionListener {
+    private JPanel container;
+    private GameClient client;
+    private boolean alreadySentStart = false;
 
-	
-	public GameStartControl(JPanel container, GameClient client)
-	{
-		this.container = container;
-		this.client = client;
-	}
+    public GameStartControl(JPanel container, GameClient client) {
+        this.container = container;
+        this.client = client;
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent ae) {
-	    String command = ae.getActionCommand();
-	    LoginPanel loginPanel = (LoginPanel) container.getComponent(1);
-	    String username = loginPanel.getUsername();
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        System.out.println("🧠 Client connected? " + client.isConnected());
 
-	    StartGameData startGameData = new StartGameData(username, false); // false = just joining
+        if (alreadySentStart) {
+            System.out.println("⛔ StartGameData already sent — ignoring duplicate click");
+            return;
+        }
 
-	    try {
-	        if (command.equals("Start Game")) {
-	            client.openConnection(); // Only host opens connection, fine
-	        }
+        alreadySentStart = true;
 
-	        client.sendToServer(startGameData);
+        String command = ae.getActionCommand();
+        LoginPanel loginPanel = (LoginPanel) container.getComponent(1);
+        String username = loginPanel.getUsername();
 
-	        //Just update username on the already existing WaitingRoomControl
-	        client.getWaitingRoomControl().setUsername(username);
+        WaitingRoomControl wrc = client.getWaitingRoomControl();
+        wrc.setUsername(username);
+        StartGameData startGameData = new StartGameData(username, false);
 
-	        //Show waiting room panel (already added in ClientGUI)
-	        CardLayout cardLayout = (CardLayout) container.getLayout();
-	        cardLayout.show(container, "6");
+        try {
+            System.out.println("🔌 Sending StartGameData...");
+            client.sendToServer(startGameData);
 
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-	}
+            // Delay slightly to ensure registration before UI flips
+            Thread.sleep(100); 
 
-	
-	
+            CardLayout cardLayout = (CardLayout) container.getLayout();
+            cardLayout.show(container, "6");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        System.out.println("🟢 UI-triggered GameClient: " + client);
 
-	
-	public void startGame()
-	{
-		CardLayout cardLayout = (CardLayout)container.getLayout();
-		cardLayout.show(container, "5");
-	}
-	
-	public void displayError(String error)
-	{
-		
-	}
+    }
 
+    public void startGame() {
+        CardLayout cardLayout = (CardLayout) container.getLayout();
+        cardLayout.show(container, "5");
+    }
+
+    public void displayError(String error) {
+        // Currently unused
+    }
 }

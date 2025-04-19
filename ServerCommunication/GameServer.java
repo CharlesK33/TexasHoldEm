@@ -10,296 +10,229 @@ import ocsf.server.*;
 import java.util.*;
 
 public class GameServer extends AbstractServer {
-	private JTextArea log;
-	private JLabel status;
-	private Database database = new Database();
-	private boolean running;
-	private ArrayList<String> players = new ArrayList<String>();
-	private GameServerControl gameServerControl = new GameServerControl();
-	
-	//Track client to username mappings
-	private Map<ConnectionToClient, String> clientToUsername = new HashMap<>();
+    private JTextArea log;
+    private JLabel status;
+    private Database database = new Database();
+    private boolean running;
+    private GameServerControl gameServerControl = new GameServerControl();
 
+    public GameServer() {
+        super(8300);
+        this.setTimeout(500);
+    }
 
+    public void setLog(JTextArea log) { this.log = log; }
+    public JTextArea getLog() { return log; }
+    public void setStatus(JLabel status) { this.status = status; }
+    public JLabel getStatus() { return status; }
+    public boolean isRunning() { return running; }
 
+    @Override
+    public void serverStarted() {
+        running = true;
+        status.setText("Listening");
+        status.setForeground(Color.GREEN);
+        log.append("Server started\n");
+    }
 
-	public GameServer() {
-		super(12345);
-		this.setTimeout(500);
-	}
+    @Override
+    public void serverStopped() {
+        status.setText("Stopped");
+        status.setForeground(Color.RED);
+        log.append("Server stopped accepting new clients - press Listen to start accepting new clients\n");
+    }
 
-	public void setLog(JTextArea log) {
-		this.log = log;
-	}
+    @Override
+    public void serverClosed() {
+        running = false;
+        status.setText("Close");
+        status.setForeground(Color.RED);
+        log.append("Server and all current clients are closed - press Listen to restart\n");
+    }
 
-	public JTextArea getLog() {
-		return log;
-	}
+    @Override
+    public void clientConnected(ConnectionToClient client) {
+        System.out.println("🧠 CONNECTED: ID=" + client.getId() + ", raw=" + client);
+    }
 
-	public void setStatus(JLabel status) {
-		this.status = status;
-	}
+    @Override
+    protected void clientDisconnected(ConnectionToClient client) {
+        String username = (String) client.getInfo("username");
+        System.out.println("💀 DISCONNECTED: " + username);
 
-	public JLabel getStatus() {
-		return status;
-	}
+        if (username != null) {
+            gameServerControl.removePlayer(username);
+            broadcastLobby();
+        }
+    }
 
-	public boolean isRunning() {
-		return running;
-	}
-	
-	
+    public void handleMessageFromClient(Object arg0, ConnectionToClient client) {
+        if (arg0 instanceof LoginData data) {
+            Object result;
+            if (database.verifyAccount(data.getUsername(), data.getPassword())) {
+                result = "LoginSuccessful";
+                log.append("Client " + client.getId() + " successfully logged in as " + data.getUsername() + "\n");
+            } else {
+                result = new Error("The username and password are incorrect.", "Login");
+                log.append("Client " + client.getId() + " failed to log in\n");
+            }
+            try {
+                client.sendToClient(result);
+            } catch (IOException e) {
+                System.out.println("Failed");
+            }
+        }
 
-	public void serverStarted() {
-		running = true;
-		status.setText("Listening");
-		status.setForeground(Color.GREEN);
-		log.append("Server started\n");
-	}
+        else if (arg0 instanceof CreateAccountData data) {
+            Object result;
+            if (database.createNewAccount(data.getUsername(), data.getPassword())) {
+                result = "CreateAccountSuccessful";
+                log.append("Client " + client.getId() + " created a new account called " + data.getUsername() + "\n");
+            } else {
+                result = new Error("The username is already in use.", "CreateAccount");
+                log.append("Client " + client.getId() + " failed to create a new account\n");
+            }
+            try {
+                client.sendToClient(result);
+            } catch (IOException e) {
+                return;
+            }
+        }
 
-	public void serverStopped() {
-		status.setText("Stopped");
-		status.setForeground(Color.RED);
-		log.append("Server stopped accepting new clients - press Listen to start accepting new clients\n");
-	}
+        else if (arg0 instanceof StartGameData data) {
+            String username = data.getUsername();
 
-	public void serverClosed() {
-		running = false;
-		status.setText("Close");
-		status.setForeground(Color.RED);
-		log.append("Server and all current clients are closed - press Listen to restart\n");
-	}
+            System.out.println("🧾 StartGameData received:");
+            System.out.println("Username: " + username);
+            System.out.println("Start flag: " + data.getStart());
 
-	public void clientConnected(ConnectionToClient client) {
-		log.append("Client " + client.getId() + " connected\n");
-	}
-	
-	
+            client.setInfo("username", username);
+            gameServerControl.addPlayer(username);
 
-	
-	
+            if (data.getStart()) {
+                System.out.println("🎮 Host starting the full game...");
+                gameServerControl.startFullGame();
+                broadcastLobby();
 
-	public void handleMessageFromClient(Object arg0, ConnectionToClient arg1) {
-		// If we received LoginData, verify the account information.
-		if (arg0 instanceof LoginData) {
-			
-			// Check the username and password with the database.
-			LoginData data = (LoginData) arg0;
-			Object result;
-			if (database.verifyAccount(data.getUsername(), data.getPassword())) {
-				result = "LoginSuccessful";
-				log.append("Client " + arg1.getId() + " successfully logged in as " + data.getUsername() + "\n");
-			} else {
-				result = new Error("The username and password are incorrect.", "Login");
-				log.append("Client " + arg1.getId() + " failed to log in\n");
-			}
+                for (ConnectionToClient conn : getAllClients()) {
+                    String user = (String) conn.getInfo("username");
+                    if (user == null) continue;
 
-			// Send the result to the client.
-			try {
-				arg1.sendToClient(result);
-			} catch (IOException e) {
-				System.out.println("Failed");
-				return;
-			}
-		}
+                    GameData gameData = gameServerControl.getGameDataForPlayer(user);
+                    gameData.setStart(true);
+                    gameData.setInGame(true);
 
-		// If we received CreateAccountData, create a new account.
-		else if (arg0 instanceof CreateAccountData) {
-			// Try to create the account.
-			CreateAccountData data = (CreateAccountData) arg0;
-			Object result;
-			if (database.createNewAccount(data.getUsername(), data.getPassword())) {
-				result = "CreateAccountSuccessful";
-				log.append("Client " + arg1.getId() + " created a new account called " + data.getUsername() + "\n");
-			} else {
-				result = new Error("The username is already in use.", "CreateAccount");
-				log.append("Client " + arg1.getId() + " failed to create a new account\n");
-			}
+                    try {
+                        conn.sendToClient(gameData);
+                        System.out.println("📤 Sent GameData to: " + user);
+                    } catch (IOException e) {
+                        log.append("Failed to send GameData to " + user + "\n");
+                    }
+                }
+            } else {
+                System.out.println("👥 Player " + username + " joined the waiting room.");
 
-			// Send the result to the client.
-			try {
-				arg1.sendToClient(result);
-			} catch (IOException e) {
-				return;
-			}
-			
-			
-			
-			
-		} 
-		
-		
-		else if (arg0 instanceof StartGameData) {
-		    StartGameData data = (StartGameData) arg0;
-		    
-		    // 🔥 DEBUG PRINT
-		    System.out.println("📨 StartGameData received:");
-		    System.out.println("   → Username: " + data.getUsername());
-		    System.out.println("   → Start flag: " + data.getStart());
+                GameData gameData = gameServerControl.getGameDataForPlayer(username);
+                gameData.setStart(false);
+                gameData.setInGame(false);
 
-		    clientToUsername.put(arg1, data.getUsername());
-		    gameServerControl.addPlayer(data.getUsername());
+                try {
+                    client.sendToClient(gameData);
+                    System.out.println("📤 Sent waiting room GameData to " + username);
+                } catch (IOException e) {
+                    log.append("Failed to send GameData to " + username + "\n");
+                }
 
-		    if (data.getStart()) {
-		        // ✅ Host clicked Start Game
-		        System.out.println("🚀 Starting the full game...");
+                LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers());
+                try {
+                    client.sendToClient(lobbyData);
+                    System.out.println("📤 Sent LobbyData to " + username);
+                } catch (IOException e) {
+                    log.append("Failed to send LobbyData to " + username + "\n");
+                }
 
-		        gameServerControl.startFullGame();
+                broadcastLobby();
+            }
+        }
 
-		        for (ConnectionToClient client : clientToUsername.keySet()) {
-		            String username = clientToUsername.get(client);
-		            GameData gameData = gameServerControl.getGameDataForPlayer(username);
-		            gameData.setStart(true);    // show GamePanel
-		            gameData.setInGame(true);   // real game now
+        else if (arg0 instanceof BetData data) {
+            String username = getClientUsername(client);
+            gameServerControl.handleBet(username, data.getBetAmount());
+            broadcastGameState();
+        }
 
-		            try {
-		                client.sendToClient(gameData);
-		                System.out.println("✅ Sent GameData to: " + username);
-		            } catch (IOException e) {
-		                log.append("Failed to send GameData to " + username + "\n");
-		            }
-		        }
-		    } else {
-		        // Player is just joining the lobby
-		        System.out.println("👥 Player " + data.getUsername() + " joined the waiting room.");
+        else if (arg0 instanceof CallData) {
+            String username = getClientUsername(client);
+            gameServerControl.handleCall(username);
+            broadcastGameState();
+        }
 
-		        GameData gameData = gameServerControl.getGameDataForPlayer(data.getUsername());
-		        gameData.setStart(false);      // show waiting room panel
-		        gameData.setInGame(false);     // not actually playing yet
+        else if (arg0 instanceof CheckData) {
+            String username = getClientUsername(client);
+            gameServerControl.handleCheck(username);
+            broadcastGameState();
+        }
 
-		        try {
-		            arg1.sendToClient(gameData);
-		            System.out.println("📤 Sent waiting room GameData to " + data.getUsername());
-		        } catch (IOException e) {
-		            log.append("Failed to send GameData to " + data.getUsername() + "\n");
-		        }
+        else if (arg0 instanceof FoldData) {
+            String username = getClientUsername(client);
+            gameServerControl.handleFold(username);
+            broadcastGameState();
+        }
+    }
 
-		        broadcastLobby();
-		    }
-		}
+    public String getClientUsername(ConnectionToClient client) {
+        return (String) client.getInfo("username");
+    }
 
+    public void broadcastGameState() {
+        for (ConnectionToClient conn : getAllClients()) {
+            String username = getClientUsername(conn);
+            if (username == null) continue;
 
+            GameData data = gameServerControl.getGameDataForPlayer(username);
+            try {
+                conn.sendToClient(data);
+                log.append("Sent GameData to " + username + "\n");
+            } catch (IOException e) {
+                log.append("Failed to send game state to " + username + ": " + e.getMessage() + "\n");
+                e.printStackTrace();
+            }
+        }
+    }
 
+    public void broadcastLobby() {
+        LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers());
+        System.out.println("📡 Broadcasting to players:");
 
-		else if (arg0 instanceof BetData) {
-		    BetData data = (BetData) arg0;
-		    String username = getClientUsername(arg1);
-		    gameServerControl.handleBet(username, data.getBetAmount());
-		    broadcastGameState();
-		}
-		else if (arg0 instanceof CallData) {
-		    String username = getClientUsername(arg1);
-		    gameServerControl.handleCall(username);
-		    broadcastGameState();
-		}
-		else if (arg0 instanceof CheckData) {
-		    String username = getClientUsername(arg1);
-		    gameServerControl.handleCheck(username);
-		    broadcastGameState();
-		}
-		else if (arg0 instanceof FoldData) {
-		    String username = getClientUsername(arg1);
-		    gameServerControl.handleFold(username);
-		    broadcastGameState();
-		}
-		else if (arg0 instanceof Card) 
-		{
-			Card card = (Card) arg0;
-		} 
-		else if (arg0 instanceof Deck) 
-		{
-			Deck data = (Deck) arg0;
-		} 
-		else if (arg0 instanceof RecordScoreData) 
-		{
-			RecordScoreData data = (RecordScoreData) arg0;
-		} 
-		else if (arg0 instanceof Error) 
-		{
-			Error data = (Error) arg0;
-		} 
-		else if (arg0 instanceof GameData) 
-		{
-			GameData data = (GameData) arg0;
-		} 
-		else if (arg0 instanceof Hand) 
-		{
-			Hand data = (Hand) arg0;
-		} 
-		else if (arg0 instanceof RaiseData) 
-		{
-			RaiseData data = (RaiseData) arg0;
-			GameData gameData;
+        for (ConnectionToClient conn : getAllClients()) {
+            String username = getClientUsername(conn);
+            System.out.println("   " + username + " → " + conn);
 
-		
-			gameData = gameServerControl.updatePot();
+            if (username != null) {
+                try {
+                    conn.sendToClient(lobbyData);
+                } catch (IOException e) {
+                    log.append("Failed to send to " + username + "\n");
+                }
+            }
+        }
 
-			/*
-			 * for (Map.Entry<Integer, GameData> entry :
-			 * gameServerControl.getMap().entrySet()) { try {
-			 * entry.getKey().sendToClient(entry.getValue()); } catch (IOException e) { //
-			 * TODO Auto-generated catch block e.printStackTrace(); } }
-			 */
-			sendToAllClients(gameData);
+        System.out.println("📢 Player list in lobby broadcast: " + lobbyData.getPlayers());
+    }
 
-		}
-	}
+    private List<ConnectionToClient> getAllClients() {
+        List<ConnectionToClient> clients = new ArrayList<>();
+        Thread[] threads = getClientConnections();
 
-	public void listeningException(Throwable exception) {
-		running = false;
-		status.setText("Exception occurred while listening");
-		status.setForeground(Color.RED);
-		log.append("Listening exception: " + exception.getMessage() + "\n");
-		log.append("Press Listen to restart server\n");
-	}
-	
-	
-	
-	//Sends the current game state to all clients
-	//Updated to send player-specific data
-	public void broadcastGameState() {
-	    if (gameServerControl == null) return;
+        for (Thread t : threads) {
+            if (t instanceof ConnectionToClient client) {
+                clients.add(client);
+            }
+        }
 
-	    for (ConnectionToClient client : clientToUsername.keySet()) {
-	        String username = clientToUsername.get(client);
-	        GameData data = gameServerControl.getGameDataForPlayer(username);
-	        try {
-	            client.sendToClient(data);
-	            log.append("Sent GameData to " + username + "\n");
-	        } catch (IOException e) {
-	            log.append("Failed to send game state to " + username + ": " + e.getMessage() + "\n");
-	            e.printStackTrace(); // show detailed error
-	        
-	        }
-	    }
+        return clients;
+    }
 
-	    
-	}
-	
-	
-	
-	//Get username of client's player
-	public String getClientUsername(ConnectionToClient client) {
-	    return clientToUsername.getOrDefault(client, "Unknown");
-	}
-	
-	
-	public void broadcastLobby() {
-	    LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers());
-	    for (ConnectionToClient client : clientToUsername.keySet()) {
-	        try {
-	            client.sendToClient(lobbyData);
-	        } catch (IOException e) {
-	            log.append("Failed to send lobby data\n");
-	        }
-	    }
-	}
-	
-	
 
 
 }
-
-
-
-

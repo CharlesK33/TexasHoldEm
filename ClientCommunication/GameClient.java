@@ -1,6 +1,9 @@
 package ClientCommunication;
 
 import ClientUserInterface.*;
+
+import javax.swing.JOptionPane;
+
 import CardGameData.*;
 import CardGameData.Error;
 import ocsf.client.AbstractClient;
@@ -103,22 +106,33 @@ public class GameClient extends AbstractClient
 
 
 	    
-	    else if (arg0 instanceof LobbyData) 
-	    {
-	    	LobbyData lobbyData = (LobbyData) arg0;
-	    	System.out.println("Received LobbyData: " + lobbyData.getPlayers());
-	        wrc.updatePlayerList(lobbyData.getPlayers());
+	    else if (arg0 instanceof LobbyData) {
+	        LobbyData lobbyData = (LobbyData) arg0;
 
-	        // Show Start Game button if player is the host (first in the list)
-	        String myUsername = wrc.getUsername();
-	        if (!lobbyData.getPlayers().isEmpty() && lobbyData.getPlayers().get(0).equals(myUsername)) 
-	        {
-	            wrc.setAsHost(true);
+	        System.out.println("Received LobbyData: " + lobbyData.getPlayers());
+	        System.out.println("Host GameClient instance: " + this);
+
+	        // ⛔ PROBLEM: wrc might still be null when this hits
+	        if (wrc == null) {
+	            System.out.println("wrc was null when LobbyData arrived. Delaying 100ms and retrying...");
+	            try {
+	                Thread.sleep(100);
+	            } catch (InterruptedException e) {
+	                e.printStackTrace();
+	            }
+	        }
+
+	        if (wrc != null) {
+	            wrc.showWaitingRoom();
+	            wrc.updatePlayerList(lobbyData.getPlayers());
+	        } else {
+	            System.out.println("STILL NULL. wrc never initialized.");
 	        }
 	    }
-
 	    
 	}
+
+
 	
 	public void connectionException(Throwable exception)
 	{
@@ -134,5 +148,11 @@ public class GameClient extends AbstractClient
 	{
 	    return wrc;
 	}
+	
+	@Override
+	protected void connectionClosed() {
+	    System.out.println("CLIENT CONNECTION CLOSED (this = " + this + ")");
+	}
+
 
 }

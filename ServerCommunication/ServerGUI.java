@@ -17,6 +17,7 @@ public class ServerGUI extends JFrame
   private JButton stop;
   private JButton quit;
   private GameServer server;
+  
 
   // Constructor for the server GUI.
 	public ServerGUI()
