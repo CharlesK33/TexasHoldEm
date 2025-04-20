@@ -92,16 +92,16 @@ public class GameClient extends AbstractClient
 	    
 	    else if (arg0 instanceof GameData) {
 	        GameData gameData = (GameData) arg0;
-	        System.out.println("GameData received from server: start=" + gameData.getStart() + ", inGame=" + gameData.isInGame() + ", user=" + gameData.getUsername());
+	        System.out.println("📬 GameData received from server: start=" + gameData.getStart() + ", inGame=" + gameData.isInGame() + ", user=" + gameData.getUsername());
 
-	        if (gameData.isInGame()) {
-	            gsc.startGame(); 
-	        } else if (gameData.getPlayers() != null && !gameData.getPlayers().isEmpty()) {
-	            wrc.showWaitingRoom();
+	        if(gameData.getStart() && gameData.isInGame()) {
+	            gsc.startGame();  // Show GamePanel
+	        } else {
+	            wrc.showWaitingRoom(); // Show waiting room
 	            wrc.updatePlayerList(gameData.getPlayers());
 	        }
 
-	        gc.updatePanel(gameData);
+	        gc.updatePanel(gameData); // or wrc.updatePanel(gameData) if needed
 	    }
 
 
@@ -117,7 +117,7 @@ public class GameClient extends AbstractClient
 	        System.out.println("Received LobbyData: " + lobbyData.getPlayers());
 	        System.out.println("Host GameClient instance: " + this);
 
-	       
+	        // ⛔ PROBLEM: wrc might still be null when this hits
 	        if (wrc == null) {
 	            System.out.println("wrc was null when LobbyData arrived. Delaying 100ms and retrying...");
 	            try {
