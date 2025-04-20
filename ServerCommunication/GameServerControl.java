@@ -160,9 +160,9 @@ public class GameServerControl {
     public void addPlayer(String username) {
         if (!players.contains(username)) {
             players.add(username);
-            System.out.println("Added player to list: " + username);
+            System.out.println("✅ Added player to list: " + username);
         }
-        System.out.println("Current player list: " + players);
+        System.out.println("👥 Current player list: " + players);
     }
 
     
