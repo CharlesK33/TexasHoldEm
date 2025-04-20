@@ -110,15 +110,9 @@ public class WaitingRoomControl implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Start Hand")) {
-       
-            if (!client.isConnected()) {
-                System.out.println("⚠️ Can't send StartGameData: client is not connected");
-                return;
-            }
 
             try {
-                System.out.println("🚀 Sending StartGameData(TRUE) to server");
-                client.sendToServer(new StartGameData(username, true));
+                client.sendToServer(new StartGameData(username, true));  // true = now REALLY starting
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
