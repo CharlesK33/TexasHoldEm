@@ -18,6 +18,7 @@ public class WaitingRoomControl implements ActionListener
     private GameClient client;
     private String username;
     private JPanel waitingRoom;
+    private boolean startAlreadyClicked = false;
 
     public WaitingRoomControl(JPanel container, GameClient client, String username) 
     {
@@ -110,8 +111,17 @@ public class WaitingRoomControl implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Start Hand")) {
+            if (startAlreadyClicked) return;
+            startAlreadyClicked = true;
+
+            if (!client.isConnected()) {
+                System.out.println("⚠️ Can't send StartGameData: client is not connected");
+                return;
+            }
+
             try {
-                client.sendToServer(new StartGameData(username, true));  // true = now REALLY starting
+                System.out.println("🚀 Sending StartGameData(TRUE) to server");
+                client.sendToServer(new StartGameData(username, true));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

@@ -105,21 +105,30 @@ public class GameServer extends AbstractServer {
             client.setInfo("username", username);
             gameServerControl.addPlayer(username);
             
-            if (data.getStart()) 
-            {
-            	LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers(), true);
-            	
-            	List<String> players = lobbyData.getPlayers();
-            	
-            	lobbyData.setPlayer1(players.get(0));
-            	
-            	try {
-					client.sendToClient(lobbyData);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+            
+            if (data.getStart()) {
+                System.out.println("Host clicked Start Hand — dealing cards and sending GameData");
+                
+                gameServerControl.startFullGame(); // Deal hole cards + flop etc.
+
+                for (ConnectionToClient conn : getAllClients()) {
+                    String user = getClientUsername(conn);
+                    if (user == null) continue;
+
+                    GameData gameData = gameServerControl.getGameDataForPlayer(user);
+                    gameData.setStart(true);
+                    gameData.setInGame(true);
+
+                    try {
+                        conn.sendToClient(gameData);
+                        System.out.println("Sent GameData to: " + user);
+                    } catch (IOException e) {
+                        log.append("Failed to send GameData to " + user + "\n");
+                    }
+                }
             }
+
+
             else if (!data.getStart()) 
             {
             	LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers(), false);

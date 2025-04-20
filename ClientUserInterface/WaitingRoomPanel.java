@@ -100,7 +100,7 @@ public class WaitingRoomPanel extends JPanel {
         playerListModel.clear();
         for (String player : players) {
             playerListModel.addElement(player);
-            System.out.println("📋 [UI] Updating player list with: " + players);
+            System.out.println("[UI] Updating player list with: " + players);
 
         }
         

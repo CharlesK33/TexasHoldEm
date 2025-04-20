@@ -34,7 +34,7 @@ public class GameStartControl implements ActionListener {
         
         if (command.equals("Start Game"))
         {
-        	StartGameData startGameData = new StartGameData(username, true);
+        	StartGameData startGameData = new StartGameData(username, false);
         	
         	try {
                 System.out.println("🔌 Sending StartGameData...");
@@ -53,7 +53,7 @@ public class GameStartControl implements ActionListener {
         	StartGameData startGameData = new StartGameData(username, false);
         	
         	try {
-                System.out.println("🔌 Sending StartGameData...");
+                System.out.println("Sending StartGameData...");
                 client.sendToServer(startGameData);
 
                 // Delay slightly to ensure registration before UI flips
