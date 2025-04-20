@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import ClientCommunication.*;
 import CardGameData.*;
@@ -145,6 +147,15 @@ public class GameControl implements ActionListener
 	    if (board != null) {
 	        gamePanel.setCommunityCards(board);
 	    }
+	    
+	    if (gameData.getPlayers() != null) {
+	        Map<String, Integer> dummyScores = new HashMap<>();
+	        for (String p : gameData.getPlayers()) {
+	            dummyScores.put(p, 100); // Replace with real score tracking later
+	        }
+	        gamePanel.setPlayersInfo(gameData.getPlayers(), dummyScores);
+	    }
+
 
 
 	    System.out.println("Setting images: " + card1.getFileName() + ", " + card2.getFileName());

@@ -196,6 +196,11 @@ public class GameServer extends AbstractServer {
             if (username == null) continue;
 
             GameData data = gameServerControl.getGameDataForPlayer(username);
+            
+            data.setStart(true); 
+            data.setInGame(true);
+            
+            
             try {
                 conn.sendToClient(data);
                 log.append("Sent GameData to " + username + "\n");

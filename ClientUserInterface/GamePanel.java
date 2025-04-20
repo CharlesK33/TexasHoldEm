@@ -1,6 +1,11 @@
 package ClientUserInterface;
 
 import javax.imageio.ImageIO;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import javax.swing.*;
 
 import CardGameData.Card;
@@ -9,7 +14,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 
 public class GamePanel extends JPanel
@@ -30,6 +34,9 @@ public class GamePanel extends JPanel
 	private JLabel card1;
 	private JLabel card2;
 	private JLabel flop1, flop2, flop3, turn, river;
+	private List<JLabel> playerNameLabels = new ArrayList<>();
+	private List<JLabel> playerScoreLabels = new ArrayList<>();
+	private JPanel playerInfoPanel;
 
 
 	
@@ -37,7 +44,7 @@ public class GamePanel extends JPanel
 	{
 		this.setLayout(new BorderLayout());
 		// Game screen partitions
-		JPanel north = new JPanel();
+		
 		//north.setPreferredSize(new Dimension(600, 300));
 		JPanel east = new JPanel();
 		JPanel center = new JPanel();
@@ -116,6 +123,14 @@ public class GamePanel extends JPanel
 		buttonPanel.add(playerBetLabel);
 		buttonPanel.add(playerBet);
 		
+		//Player list
+				JPanel north = new JPanel(new BorderLayout());
+
+				playerInfoPanel = new JPanel();
+				playerInfoPanel.setBackground(new Color(30, 92, 58));
+				playerInfoPanel.setLayout(new GridLayout(5, 2)); 
+
+		
 		// Game Screen
 		JPanel border = new JPanel(new BorderLayout());
 		JPanel southBorder = new JPanel(new BorderLayout());
@@ -140,6 +155,7 @@ public class GamePanel extends JPanel
 		border.add(east, BorderLayout.EAST);
 		border.add(north, BorderLayout.NORTH);
 		border.add(west, BorderLayout.WEST);
+	
 		
 		this.add(border);
 		
@@ -158,8 +174,12 @@ public class GamePanel extends JPanel
 		communityPanel.add(turn);
 		communityPanel.add(river);
 
+		JPanel northWrapper = new JPanel(new BorderLayout());
+		northWrapper.setBackground(new Color(30, 92, 58));
+		northWrapper.add(playerInfoPanel, BorderLayout.WEST);
+		northWrapper.add(communityPanel, BorderLayout.CENTER);
 		
-		north.add(communityPanel);
+		border.add(northWrapper, BorderLayout.NORTH);
 
 				
 	}
@@ -239,6 +259,32 @@ public class GamePanel extends JPanel
 	        }
 	    }
 	}
+	
+
+	public void setPlayersInfo(List<String> players, Map<String, Integer> playerScores) {
+	    playerInfoPanel.removeAll(); // clear existing components
+	    playerInfoPanel.setLayout(new GridLayout(players.size(), 2)); // update layout
+
+	    playerNameLabels.clear();
+	    playerScoreLabels.clear();
+
+	    for (String name : players) {
+	        JLabel nameLabel = new JLabel(name, JLabel.LEFT);
+	        nameLabel.setForeground(new Color(255, 215, 0));
+	        JLabel scoreLabel = new JLabel("Score: " + playerScores.getOrDefault(name, 0), JLabel.RIGHT);
+	        scoreLabel.setForeground(new Color(255, 215, 0));
+
+	        playerNameLabels.add(nameLabel);
+	        playerScoreLabels.add(scoreLabel);
+
+	        playerInfoPanel.add(nameLabel);
+	        playerInfoPanel.add(scoreLabel);
+	    }
+
+	    playerInfoPanel.revalidate();
+	    playerInfoPanel.repaint();
+	}
+
 
 
 	

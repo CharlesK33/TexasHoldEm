@@ -87,12 +87,12 @@ public class WaitingRoomControl implements ActionListener
     }
     
     public void setUsername(String username) {
-        System.out.println("🟢 Setting username in WRC: " + username);
+        System.out.println("Setting username in WRC: " + username);
         this.username = username;
     }
 
     public String getUsername() {
-        System.out.println("🔍 getUsername() called, returning: " + username);
+        System.out.println("getUsername() called, returning: " + username);
         return username;
     }
     
@@ -115,12 +115,12 @@ public class WaitingRoomControl implements ActionListener
             startAlreadyClicked = true;
 
             if (!client.isConnected()) {
-                System.out.println("⚠️ Can't send StartGameData: client is not connected");
+                System.out.println("Can't send StartGameData: client is not connected");
                 return;
             }
 
             try {
-                System.out.println("🚀 Sending StartGameData(TRUE) to server");
+                System.out.println("Sending StartGameData(TRUE) to server");
                 client.sendToServer(new StartGameData(username, true));
             } catch (IOException ex) {
                 ex.printStackTrace();
