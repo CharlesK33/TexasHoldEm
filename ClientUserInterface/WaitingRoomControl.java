@@ -109,13 +109,10 @@ public class WaitingRoomControl implements ActionListener
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Start Hand")) {
+        if (e.getActionCommand().equals("Start Hand")) 
+        {
 
-            try {
-                client.sendToServer(new StartGameData(username, true));  // true = now REALLY starting
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+          
         }
     }
 
