@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import CardGameData.*;
 
@@ -18,6 +19,7 @@ public class WaitingRoomControl implements ActionListener
     private GameClient client;
     private String username;
     private JPanel waitingRoom;
+    private ArrayList<String> players;
 
     public WaitingRoomControl(JPanel container, GameClient client, String username) 
     {
@@ -39,6 +41,11 @@ public class WaitingRoomControl implements ActionListener
     public void updatePanel(LobbyData lobbyData)
     {
     	WaitingRoomPanel waitingRoom = (WaitingRoomPanel)container.getComponent(5);
+    	
+    	if (lobbyData.getStart())
+    	{
+    		waitingRoom.showStartHand();
+    	}
     	
     	if (lobbyData.getPlayer1() != null)
     	{
@@ -65,6 +72,11 @@ public class WaitingRoomControl implements ActionListener
     	{
     		waitingRoom.setPlayer5Label(lobbyData.getPlayer5());
     	}
+    }
+    
+    public void setPlayers(LobbyData lobbyData)
+    {
+    	players = lobbyData.getPlayers();
     }
 
     public void updatePlayerList(List<String> players) {
@@ -108,11 +120,22 @@ public class WaitingRoomControl implements ActionListener
 
     
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) 
+    {
         if (e.getActionCommand().equals("Start Hand")) 
         {
-
-          
+        	GameData gameData = new GameData();
+        	gameData.setPlayers(players);
+        	gameData.setCurrentBet(10);
+        	gameData.setPot(15);
+        	gameData.setStart(true);
+        	
+        	try {
+				client.sendToServer(gameData);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     }
 

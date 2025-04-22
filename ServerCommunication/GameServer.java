@@ -26,6 +26,7 @@ public class GameServer extends AbstractServer {
     public void setStatus(JLabel status) { this.status = status; }
     public JLabel getStatus() { return status; }
     public boolean isRunning() { return running; }
+    
 
     @Override
     public void serverStarted() {
@@ -52,7 +53,7 @@ public class GameServer extends AbstractServer {
 
     @Override
     public void clientConnected(ConnectionToClient client) {
-        System.out.println("🧠 CONNECTED: ID=" + client.getId() + ", raw=" + client);
+    	log.append("Client " + client.getId() + " connected\n");
     }
 
     @Override
@@ -67,6 +68,8 @@ public class GameServer extends AbstractServer {
     }
 
     public void handleMessageFromClient(Object arg0, ConnectionToClient client) {
+    	
+    	
         if (arg0 instanceof LoginData data) {
             Object result;
             if (database.verifyAccount(data.getUsername(), data.getPassword())) {
@@ -109,7 +112,7 @@ public class GameServer extends AbstractServer {
             {
             	LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers(), true);
             	
-            	List<String> players = lobbyData.getPlayers();
+            	ArrayList<String> players = lobbyData.getPlayers();
             	
             	lobbyData.setPlayer1(players.get(0));
             	
@@ -124,7 +127,7 @@ public class GameServer extends AbstractServer {
             {
             	LobbyData lobbyData = new LobbyData(gameServerControl.getPlayers(), false);
             	
-            	List<String> players = lobbyData.getPlayers();
+            	ArrayList<String> players = lobbyData.getPlayers();
             	
             	lobbyData.setPlayer1(players.get(0));
             	
@@ -151,29 +154,228 @@ public class GameServer extends AbstractServer {
             	sendToAllClients(lobbyData);
             }
         }
-
-        else if (arg0 instanceof BetData data) {
-            String username = getClientUsername(client);
-            gameServerControl.handleBet(username, data.getBetAmount());
-            broadcastGameState();
+        
+        else if(arg0 instanceof GameData data)
+        {
+        	GameData updatedData = new GameData();
+        	if (data.getStart())
+        	{
+        		// Initialize game panel
+        		updatedData.setPot(data.getPot());
+        		updatedData.setCurrentBet(data.getCurrentBet());
+        		updatedData.setStart(true);
+        		updatedData.setPlayers(data.getPlayers());
+        		updatedData.setDealer(0);
+        		
+        		sendToAllClients(updatedData);
+        		
+        		ArrayList<ConnectionToClient> clients = getAllClients();
+        		
+        		int i = 0;
+        		for (ConnectionToClient conn : clients)
+        		{
+        			Hand hand = gameServerControl.dealHoleCards();
+            		GameData handData = new GameData();
+            		handData.setHand(hand);
+            		handData.setUsername(data.getPlayers().get(i));
+            		
+            		if (updatedData.getDealer() + 1 == i)
+            		{
+            			handData.setScore(95);
+            		}
+            		else if (updatedData.getDealer() + 2 == i)
+            		{
+            			handData.setScore(90);
+            		}
+            		else
+            		{
+            			handData.setScore(100);
+            		}
+            		
+            		
+            		try {
+    					conn.sendToClient(handData);
+    				} catch (IOException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+            		
+            		i++;
+        		}
+        		
+        	}
         }
 
-        else if (arg0 instanceof CallData) {
-            String username = getClientUsername(client);
-            gameServerControl.handleCall(username);
-            broadcastGameState();
+        else if (arg0 instanceof BetData data) 
+        {
+			GameData gameData;
+			
+			int currentBet = data.getBetAmount();
+			gameData = gameServerControl.updateCurrentBet(currentBet);
+			gameData.setBetAmount(data.getBetAmount());
+			gameData.setUsername(data.getUsername());
+			
+			int currentPlayerIndex = gameServerControl.getCurrentPlayerIndex();
+			
+            int roundCount = gameServerControl.getRoundCount();
+            int numPlayers = gameServerControl.getPlayers().size();
+            
+            if (currentPlayerIndex + 1 < numPlayers)
+            {
+            	gameServerControl.setCurrentPlayerIndex(currentPlayerIndex + 1);
+            }
+            else
+            {
+            	gameServerControl.setCurrentPlayerIndex(0);
+            	gameServerControl.setRoundCount(roundCount + 1);
+            	roundCount = gameServerControl.getRoundCount();
+            	if (roundCount == 1)
+            	{
+            		gameData.setFlop(gameServerControl.dealFlop());
+            	}
+            	else if (roundCount == 2)
+            	{
+            		gameData.setTurn(gameServerControl.dealTurn());
+            	}
+            	else if (roundCount == 3)
+            	{
+            		gameData.setRiver(gameServerControl.dealRiver());
+            	}
+            	else if (roundCount > 3)
+            	{
+            		gameData.setEndOfHand(true);
+            	}
+            	
+            }
+            
+            gameData.setPlayerTurn(gameServerControl.getCurrentPlayerIndex());
+			
+			sendToAllClients(gameData);
         }
 
-        else if (arg0 instanceof CheckData) {
-            String username = getClientUsername(client);
-            gameServerControl.handleCheck(username);
-            broadcastGameState();
+        
+        else if (arg0 instanceof CallData) 
+        {
+        	CallData callData = (CallData)arg0;
+            GameData gameData = new GameData();
+            
+            gameData.setBetAmount(callData.getCurrentBet());
+            gameData.setUsername(callData.getUsername());
+            
+            int currentPlayerIndex = gameServerControl.getCurrentPlayerIndex();
+            int roundCount = gameServerControl.getRoundCount();
+            int numPlayers = gameServerControl.getPlayers().size();
+            
+            if (currentPlayerIndex + 1 < numPlayers)
+            {
+            	gameServerControl.setCurrentPlayerIndex(currentPlayerIndex + 1);
+            }
+            else
+            {
+            	gameServerControl.setCurrentPlayerIndex(0);
+            	gameServerControl.setRoundCount(roundCount + 1);
+            	roundCount = gameServerControl.getRoundCount();
+            	if (roundCount == 1)
+            	{
+            		gameData.setFlop(gameServerControl.dealFlop());
+            	}
+            	else if (roundCount == 2)
+            	{
+            		gameData.setTurn(gameServerControl.dealTurn());
+            	}
+            	else if (roundCount == 3)
+            	{
+            		gameData.setRiver(gameServerControl.dealRiver());
+            	}
+            	
+            }
+            
+            gameData.setPlayerTurn(gameServerControl.getCurrentPlayerIndex());
+            
+            sendToAllClients(gameData);
         }
 
-        else if (arg0 instanceof FoldData) {
-            String username = getClientUsername(client);
-            gameServerControl.handleFold(username);
-            broadcastGameState();
+        else if (arg0 instanceof CheckData) 
+        {
+        	CheckData checkData = (CheckData)arg0;
+            GameData gameData = new GameData();
+            
+            int currentPlayerIndex = gameServerControl.getCurrentPlayerIndex();
+            int roundCount = gameServerControl.getRoundCount();
+            int numPlayers = gameServerControl.getPlayers().size();
+            
+            if (currentPlayerIndex + 1 < numPlayers)
+            {
+            	gameServerControl.setCurrentPlayerIndex(currentPlayerIndex + 1);
+            }
+            else
+            {
+            	gameServerControl.setCurrentPlayerIndex(0);
+            	gameServerControl.setRoundCount(roundCount + 1);
+            	roundCount = gameServerControl.getRoundCount();
+            	if (roundCount == 1)
+            	{
+            		gameData.setFlop(gameServerControl.dealFlop());
+            	}
+            	else if (roundCount == 2)
+            	{
+            		gameData.setTurn(gameServerControl.dealTurn());
+            	}
+            	else if (roundCount == 3)
+            	{
+            		gameData.setRiver(gameServerControl.dealRiver());
+            	}
+            	
+            }
+            
+            gameData.setPlayerTurn(gameServerControl.getCurrentPlayerIndex());
+            
+            sendToAllClients(gameData);
+        }
+        
+        
+
+        else if (arg0 instanceof FoldData) 
+        {
+            FoldData foldData = (FoldData)arg0;
+            GameData gameData = new GameData();
+            gameData.setUsername(foldData.getUsername());
+            gameData.setFolding(true);
+            
+            int currentPlayerIndex = gameServerControl.getCurrentPlayerIndex();
+            int roundCount = gameServerControl.getRoundCount();
+            int numPlayers = gameServerControl.getPlayers().size();
+            
+            if (currentPlayerIndex + 1 < numPlayers)
+            {
+            	gameServerControl.setCurrentPlayerIndex(currentPlayerIndex + 1);
+            }
+            else
+            {
+            	gameServerControl.setCurrentPlayerIndex(0);
+            	gameServerControl.setRoundCount(roundCount + 1);
+            	roundCount = gameServerControl.getRoundCount();
+            	if (roundCount == 1)
+            	{
+            		gameData.setFlop(gameServerControl.dealFlop());
+            	}
+            	else if (roundCount == 2)
+            	{
+            		gameData.setTurn(gameServerControl.dealTurn());
+            	}
+            	else if (roundCount == 3)
+            	{
+            		gameData.setRiver(gameServerControl.dealRiver());
+            	}
+            	
+            }
+            
+            gameData.setPlayerTurn(gameServerControl.getCurrentPlayerIndex());
+            
+            
+            sendToAllClients(gameData);
+            
+            
         }
     }
 
@@ -181,6 +383,7 @@ public class GameServer extends AbstractServer {
         return (String) client.getInfo("username");
     }
 
+    /*
     public void broadcastGameState() {
         for (ConnectionToClient conn : getAllClients()) {
             String username = getClientUsername(conn);
@@ -196,9 +399,10 @@ public class GameServer extends AbstractServer {
             }
         }
     }
+    */
 
-    private List<ConnectionToClient> getAllClients() {
-        List<ConnectionToClient> clients = new ArrayList<>();
+    private ArrayList<ConnectionToClient> getAllClients() {
+        ArrayList<ConnectionToClient> clients = new ArrayList<>();
         Thread[] threads = getClientConnections();
 
         for (Thread t : threads) {

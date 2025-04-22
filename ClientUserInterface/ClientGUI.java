@@ -12,15 +12,17 @@ public class ClientGUI extends JFrame
     private GameClient client; 
     
     public ClientGUI() {
-        this.client = new GameClient();
-        this.client.setHost("localhost");
-        this.client.setPort(8300);
+        client = new GameClient();
+        client.setHost("localhost");
+        client.setPort(8300);
 
         try {
-            this.client.openConnection();
+            client.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        System.out.println("Client is connected: " + client.isConnected());
 
         this.setTitle("Texas Hold 'Em");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,17 +31,17 @@ public class ClientGUI extends JFrame
         JPanel container = new JPanel(cardLayout);
 
         InitialControl ic = new InitialControl(container);
-        GameControl gc = new GameControl(container, this.client);
-        LoginControl lc = new LoginControl(container, this.client);
-        CreateAccountControl cac = new CreateAccountControl(container, this.client);
-        GameStartControl gsc = new GameStartControl(container, this.client);
-        WaitingRoomControl wrc = new WaitingRoomControl(container, this.client, "");
+        GameControl gc = new GameControl(container, client);
+        LoginControl lc = new LoginControl(container, client);
+        CreateAccountControl cac = new CreateAccountControl(container, client);
+        GameStartControl gsc = new GameStartControl(container, client);
+        WaitingRoomControl wrc = new WaitingRoomControl(container, client, "");
 
-        this.client.setLoginControl(lc);
-        this.client.setCreateAccountControl(cac);
-        this.client.setGameStartControl(gsc);
-        this.client.setWaitingRoomControl(wrc);
-        this.client.setGameControl(gc);
+        client.setLoginControl(lc);
+        client.setCreateAccountControl(cac);
+        client.setGameStartControl(gsc);
+        client.setWaitingRoomControl(wrc);
+        client.setGameControl(gc);
 
         JPanel view1 = new InitialPanel(ic);
         JPanel view2 = new LoginPanel(lc);
@@ -60,7 +62,8 @@ public class ClientGUI extends JFrame
         this.setLayout(new BorderLayout());
         this.add(container);
 
-        this.setSize(1200, 675);
+        //this.setSize(1200, 775);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }

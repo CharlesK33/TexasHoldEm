@@ -10,13 +10,15 @@ public class GameServerControl {
     private ConnectionToClient client;
 
     //Game state
-    private List<String> players;
+    private ArrayList<String> players;
     private Map<String, Hand> hands;
     private Deck deck;
-    private List<Card> board;
     private int pot;
     private int currentBet;
     private int currentPlayerIndex;
+    private int roundCount;
+    private int dealerIndex;
+    private GameData gameData;
     private GamePhase phase;
     private boolean gameStarted = false;
 
@@ -29,10 +31,10 @@ public class GameServerControl {
         players = new ArrayList<>();
         hands = new HashMap<>();
         deck = new Deck();
-        board = new ArrayList<>();
         pot = 0;
         currentBet = 0;
         currentPlayerIndex = 0;
+        roundCount = 0;
         phase = GamePhase.PRE_FLOP;
     }
 
@@ -46,41 +48,57 @@ public class GameServerControl {
     }
 
     // Deals 2 cards to each player
-    public void dealHoleCards() {
-        for (String player : players) {
-            Hand hand = new Hand();
-            ArrayList<Card> cards = new ArrayList<>();
-            cards.add(deck.drawCard());
-            cards.add(deck.drawCard());
-            hand.setHand(cards);
-            hands.put(player, hand);
-        }
-        System.out.println("Dealt hole cards to all players.");
+    public Hand dealHoleCards() 
+    {
+        Hand hand = new Hand();
+        ArrayList<Card> cards = new ArrayList<>();
+        cards.add(deck.drawCard());
+        cards.add(deck.drawCard());
+        hand.setHand(cards);
+         
+        return hand;
     }
 
     //Deals the flop (3 community cards)
-    public void dealFlop() {
-        board.add(deck.drawCard());
-        board.add(deck.drawCard());
-        board.add(deck.drawCard());
+    public ArrayList<Card> dealFlop() {
+    	ArrayList<Card> flop = new ArrayList<>();
+        flop.add(deck.drawCard());
+        flop.add(deck.drawCard());
+        flop.add(deck.drawCard());
         phase = GamePhase.FLOP;
-        System.out.println("Flop dealt.");
+        return flop;
     }
 
     //Deals the turn
-    public void dealTurn() {
-        board.add(deck.drawCard());
+    
+    public Card dealTurn() {
+    	Card turn = deck.drawCard();
+  
         phase = GamePhase.TURN;
-        System.out.println("Turn dealt.");
+        return turn;
     }
+    
 
     //Deals the river
-    public void dealRiver() {
-        board.add(deck.drawCard());
+    public Card dealRiver() {
+        Card river = deck.drawCard();
         phase = GamePhase.RIVER;
-        System.out.println("River dealt.");
+        return river;
+    }
+    
+    
+    
+    public int takeSmallBlind(int score)
+    {
+    	return score - 5;
+    }
+    
+    public int takeBigBlind(int score)
+    {
+    	return score - 10;
     }
 
+    /*
     //Progresses to the next game phase
     public void advancePhase() {
         switch (phase) {
@@ -93,18 +111,19 @@ public class GameServerControl {
             }
         }
     }
+    */
 
     //Placeholder for hand evaluation logic
     public void evaluateHands() {
         System.out.println("Evaluating hands...");
     }
 
-    public void handleBet(String username, int amount) {
-        currentBet = amount;
-        pot += amount;
-        System.out.println(username + " bet " + amount);
-        nextTurn();
-    }
+    public GameData updateCurrentBet(int currentBet)
+	{
+		gameData = new GameData();
+		gameData.setCurrentBet(currentBet);
+		return gameData;
+	}
 
     public void handleCall(String username) {
         pot += currentBet;
@@ -136,7 +155,16 @@ public class GameServerControl {
     public String getCurrentPlayer() {
         return players.get(currentPlayerIndex);
     }
+    
+    public int getCurrentPlayerIndex() {
+    	return currentPlayerIndex;
+    }
+    
+    public void setCurrentPlayerIndex(int currentPlayerIndex) {
+    	this.currentPlayerIndex = currentPlayerIndex;
+    }
 
+    /*
     public GameData getGameDataForPlayer(String username) {
         GameData data = new GameData();
         data.setBoard(new ArrayList<>(board));
@@ -147,6 +175,7 @@ public class GameServerControl {
         data.setPlayers(new ArrayList<>(players));
         return data;
     }
+    */
     
     
     public GameData updatePot() {
@@ -163,6 +192,11 @@ public class GameServerControl {
             System.out.println("✅ Added player to list: " + username);
         }
         System.out.println("👥 Current player list: " + players);
+    }
+    
+    public void setDealerIndex(int index)
+    {
+    	dealerIndex = index;
     }
 
     
@@ -199,7 +233,7 @@ public class GameServerControl {
         this.gameStarted = started;
     }
     
-    public List<String> getPlayers() 
+    public ArrayList<String> getPlayers() 
     {
         return players;
     }
@@ -207,6 +241,14 @@ public class GameServerControl {
     public void removePlayer(String username) {
         players.remove(username);
     }
+
+	public int getRoundCount() {
+		return roundCount;
+	}
+
+	public void setRoundCount(int roundCount) {
+		this.roundCount = roundCount;
+	}
 
 
 

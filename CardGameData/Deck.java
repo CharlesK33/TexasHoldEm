@@ -1,8 +1,9 @@
 package CardGameData;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class Deck {
+public class Deck implements Serializable{
     private Card[] cards = new Card[52];
     private int drawIndex = 0;
     private Random random = new Random();

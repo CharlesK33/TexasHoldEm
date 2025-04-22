@@ -1,11 +1,12 @@
 package CardGameData;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyData implements Serializable 
 {
-    private List<String> players;
+    private ArrayList<String> players;
     private String player1;
     private String player2;
     private String player3;
@@ -13,7 +14,7 @@ public class LobbyData implements Serializable
     private String player5;
     private boolean start;
 
-    public LobbyData(List<String> players, boolean start) 
+    public LobbyData(ArrayList<String> players, boolean start) 
     {
         this.players = players;
         this.start = start;
@@ -24,7 +25,7 @@ public class LobbyData implements Serializable
     	return start;
     }
 
-    public List<String> getPlayers() 
+    public ArrayList<String> getPlayers() 
     {
         return players;
     }

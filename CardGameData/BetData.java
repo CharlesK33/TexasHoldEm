@@ -2,20 +2,35 @@ package CardGameData;
 
 import java.io.Serializable;
 
-public class BetData implements Serializable{
-public int betAmount;
-public void setBetAmount(int betAmount)
+public class BetData implements Serializable
 {
-	this.betAmount = betAmount;
-}
-public int getBetAmount()
-{
-	return betAmount;
-}
+	private int betAmount;
+	private String username;
+	
+	public BetData(int bet, String username)
+	{
+		setBetAmount(bet);
+		setUsername(username);
+	}
+	
+	public void setBetAmount(int betAmount)
+	{
+		this.betAmount = betAmount;
+	}
+	
+	public int getBetAmount()
+	{
+		return betAmount;
+	}
 
-public BetData(int bet)
-{
-	setBetAmount(bet);
-}
+	public String getUsername() 
+	{
+		return username;
+	}
+	
+	public void setUsername(String username) 
+	{
+		this.username = username;
+	}
 
 }

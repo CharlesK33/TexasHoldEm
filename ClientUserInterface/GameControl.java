@@ -13,6 +13,7 @@ public class GameControl implements ActionListener
 {
 	private JPanel container;
 	private GameClient client;
+	private ArrayList<String> players;
 	
 	public GameControl(JPanel container, GameClient client)
 	{
@@ -27,80 +28,313 @@ public class GameControl implements ActionListener
 		
 		if (command == "Check")
 		{
-			CheckData checkData = new CheckData(true);
+			GamePanel gamePanel = (GamePanel)container.getComponent(4);
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
 			
-			try {
-				client.sendToServer(checkData);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (username.equals(playerTurn))
+			{
+				CheckData checkData = new CheckData(true);
+			
+				try {
+					client.sendToServer(checkData);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
+			}
+			
 		}
 		else if (command == "Fold")
 		{
-			FoldData foldData = new FoldData(true);
+			GamePanel gamePanel = (GamePanel)container.getComponent(4);
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
 			
-			try {
+			if (username.equals(playerTurn))
+			{
+				username = gamePanel.getPlayerTurnLabel();
+				FoldData foldData = new FoldData(true, username);
+			
+				try {
 				client.sendToServer(foldData);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
+			}
+			
 		}
 		else if (command == "Call")
 		{
 			GamePanel gamePanel = (GamePanel)container.getComponent(4);
-			int currentBet = gamePanel.getCurrentBet();
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
 			
-			CallData callData = new CallData(currentBet);
+			if (username.equals(playerTurn))
+			{
+				username = gamePanel.getPlayerTurnLabel();
+				int currentBet = gamePanel.getCurrentBet();
 			
-			try {
-				client.sendToServer(callData);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				CallData callData = new CallData(currentBet, username);
+			
+				try {
+					client.sendToServer(callData);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
+			}
+			
 		}
 		else if (command == "Raise")
 		{		
 			GamePanel gamePanel = (GamePanel)container.getComponent(4);
-			int current = gamePanel.getCurrentBet();
-			gamePanel.setPlayerBetLabel(current);
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
+			
+			if (username.equals(playerTurn))
+			{
+				int current = gamePanel.getCurrentBet();
+				gamePanel.setPlayerBetLabel(current);
+			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
+			}
+			
 		}
 		else if (command == "Bet")
 		{
 			GamePanel gamePanel = (GamePanel)container.getComponent(4);
-			gamePanel.setPlayerBetLabel(10);
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
+			
+			if (username.equals(playerTurn))
+			{
+				gamePanel.setPlayerBetLabel(10);
+			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
+			}
+			
 		}
 		else if (command == "Increase +")
 		{
 			GamePanel gamePanel = (GamePanel)container.getComponent(4);
-			int current = gamePanel.getPlayerBetAmt();
-			gamePanel.setPlayerBetLabel(current + 10);
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
+			
+			if (username.equals(playerTurn))
+			{
+				int current = gamePanel.getPlayerBetAmt();
+				gamePanel.setPlayerBetLabel(current + 10);
+			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
+			}
+			
 		}
 		else if (command == "Decrease -")
 		{
+			
 			GamePanel gamePanel = (GamePanel)container.getComponent(4);
-			int current = gamePanel.getPlayerBetAmt();
-			gamePanel.setPlayerBetLabel(current - 10);
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
+			
+			if (username.equals(playerTurn))
+			{
+				int current = gamePanel.getPlayerBetAmt();
+				gamePanel.setPlayerBetLabel(current - 10);
+			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
+			}
+			
 		}
-		else if (command == "Enter")
+		else if (command.equals("Enter"))
 		{
 			GamePanel gamePanel = (GamePanel)container.getComponent(4);
 			int current = gamePanel.getPlayerBetAmt();
+			String username = gamePanel.getUsername();
+			String playerTurn = gamePanel.getPlayerTurnLabel();
 			
-			BetData betData = new BetData(current);
-			try {
-				client.sendToServer(betData);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (username.equals(playerTurn))
+			{
+				BetData betData = new BetData(current, username);
+				try {
+					client.sendToServer(betData);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				displayError("Out of turn.");
+				
+				new javax.swing.Timer(3000, e -> {
+		            displayError(""); // Clear the error message
+		        }).start();
+				
+			    return;
 			}
 		}
-		
-		
 	}
 	
+	public void showGamePanel()
+    {
+    	CardLayout cardLayout = (CardLayout)container.getLayout();
+    	cardLayout.show(container, "5");
+    }
+	
+	public void initializePanel(GameData gameData)
+	{
+		GamePanel gamePanel = (GamePanel) container.getComponent(4);
+		gamePanel.setPotLabel(gameData.getPot());
+		gamePanel.setCurrentBetLabel(gameData.getCurrentBet());
+		players = (ArrayList<String>) gameData.getPlayers();
+		
+		if (players.size() == 1)
+		{
+			gamePanel.setPlayer1Label(players.get(0));
+			gamePanel.setPlayer1ScoreLabel(100);
+			gamePanel.showPlayer1Cards();
+		}
+		else if (players.size() == 2)
+		{
+			String player = players.get(gameData.getDealer() + 1);
+	    	gamePanel.setPlayerTurnLabel(player);
+	    	
+			gamePanel.setPlayer1Label(players.get(0));
+			gamePanel.setPlayer1ScoreLabel(95);
+			gamePanel.showPlayer1Cards();
+			
+			gamePanel.setPlayer2Label(players.get(1));
+			gamePanel.setPlayer2ScoreLabel(90);
+			gamePanel.showPlayer2Cards();
+		}
+		else if (players.size() == 3)
+		{
+			String player = players.get(gameData.getDealer() + 2);
+	    	gamePanel.setPlayerTurnLabel(player);
+	    	
+			gamePanel.setPlayer1Label(players.get(0));
+			gamePanel.setPlayer1ScoreLabel(100);
+			gamePanel.showPlayer1Cards();
+			
+			gamePanel.setPlayer2Label(players.get(1));
+			gamePanel.setPlayer2ScoreLabel(95);
+			gamePanel.showPlayer2Cards();
+			
+			gamePanel.setPlayer3Label(players.get(2));
+			gamePanel.setPlayer3ScoreLabel(90);
+			gamePanel.showPlayer3Cards();
+		}
+		else if (players.size() == 4)
+		{
+			String player = players.get(gameData.getDealer());
+	    	gamePanel.setPlayerTurnLabel(player + 2);
+	    	
+			gamePanel.setPlayer1Label(players.get(0));
+			gamePanel.setPlayer1ScoreLabel(100);
+			gamePanel.showPlayer1Cards();
+			
+			gamePanel.setPlayer2Label(players.get(1));
+			gamePanel.setPlayer2ScoreLabel(95);
+			gamePanel.showPlayer2Cards();
+			
+			gamePanel.setPlayer3Label(players.get(2));
+			gamePanel.setPlayer3ScoreLabel(90);
+			gamePanel.showPlayer3Cards();
+			
+			gamePanel.setPlayer4Label(players.get(3));
+			gamePanel.setPlayer4ScoreLabel(100);
+			gamePanel.showPlayer4Cards();
+		}
+		else if (players.size() == 5)
+		{
+			String player = players.get(gameData.getDealer());
+	    	gamePanel.setPlayerTurnLabel(player + 2);
+	    	
+			gamePanel.setPlayer1Label(players.get(0));
+			gamePanel.setPlayer1ScoreLabel(100);
+			gamePanel.showPlayer1Cards();
+			
+			gamePanel.setPlayer2Label(players.get(1));
+			gamePanel.setPlayer2ScoreLabel(95);
+			gamePanel.showPlayer2Cards();
+			
+			gamePanel.setPlayer3Label(players.get(2));
+			gamePanel.setPlayer3ScoreLabel(90);
+			gamePanel.showPlayer3Cards();
+			
+			gamePanel.setPlayer4Label(players.get(3));
+			gamePanel.setPlayer4ScoreLabel(100);
+			gamePanel.showPlayer4Cards();
+			
+			gamePanel.setPlayer5Label(players.get(4));
+			gamePanel.setPlayer5ScoreLabel(100);
+			gamePanel.showPlayer5Cards();
+		}
+	}
 	
 	public void updatePanel(GameData gameData) {
 	   
@@ -112,44 +346,75 @@ public class GameControl implements ActionListener
 	    if (gameData.getScore() != 0) {
 	        gamePanel.setScoreLabel(gameData.getScore());
 	    }
+	    
+	    if (!players.get(gameData.getPlayerTurn()).equals(gamePanel.getPlayerTurnLabel()))
+	    {
+	    	gamePanel.setPlayerTurnLabel(players.get(gameData.getPlayerTurn()));
+	    }
 
 	    // Username update
 	 
-	    if (!gameData.getUsername().equals("") && gamePanel.getUsername().equals("")) {
-	        gamePanel.setUsernameLabel(gameData.getUsername());
-	    }
+	    if (gameData.getUsername() != null && gamePanel.getUsername() == "")
+		{
+			gamePanel.setUsernameLabel(gameData.getUsername());
+		}
 
 	    // Bet update
 	   
-	    if (gameData.getCurrentBet() != gamePanel.getCurrentBet()) {
+	    if (gameData.getCurrentBet() != gamePanel.getCurrentBet() && gameData.getCurrentBet() != 0) {
 	        gamePanel.setCurrentBetLabel(gameData.getCurrentBet());
 	    }
-
-	    // Hand + Card debug
-	    Hand hand = gameData.getHand();
-	    ArrayList<Card> cards = hand.getHand();
-	    if (cards == null || cards.size() < 2) {
-	        System.out.println("Cards are missing or fewer than 2. Size: " + (cards == null ? "null" : cards.size()));
-	        return;
-	    }
-
-	    Card card1 = cards.get(0);
-	    Card card2 = cards.get(1);
-
-	    if (card1 == null || card2 == null) {
-	        System.out.println("One or both cards are null: " + card1 + ", " + card2);
-	        return;
+	    
+	    if (gameData.getHand() != null)
+	    {
+	    	gamePanel.setCardImages(gameData.getHand().getHand().getFirst(), gameData.getHand().getHand().getLast());
 	    }
 	    
-	    ArrayList<Card> board = gameData.getBoard();
-	    if (board != null) {
-	        gamePanel.setCommunityCards(board);
+	    if (gameData.isFolding()) 
+	    {
+	    	gamePanel.removeFoldedPlayer(players, gameData.getUsername());
 	    }
-
-
-	    System.out.println("Setting images: " + card1.getFileName() + ", " + card2.getFileName());
-
-	    gamePanel.setCardImages(card1, card2);
+	    
+	    if (gameData.getFlop() != null)
+	    {
+	    	gamePanel.showFlop(gameData.getFlop());
+	    }
+	    
+	    if (gameData.getTurn() != null)
+	    {
+	    	gamePanel.showTurn(gameData.getTurn());
+	    }
+	    
+	    if (gameData.getRiver() != null)
+	    {
+	    	gamePanel.showRiver(gameData.getRiver());
+	    }
+	    
+	    if (gameData.getUsername() != null && gameData.getUsername().equals(gamePanel.getUsername()) && gameData.getBetAmount() == gamePanel.getCurrentBet()) 
+	    {
+	    	int betAmount = gameData.getBetAmount();
+	    	gamePanel.setScoreLabel(gamePanel.getScoreLabel() - betAmount);
+	    	gamePanel.setPotLabel(gamePanel.getPot() + betAmount);
+	    }
+	    
+	    if (gameData.getUsername() != null && gameData.getUsername().equals(gamePanel.getUsername()) && gameData.getBetAmount() != gamePanel.getCurrentBet()) 
+	    {
+	    	int betAmount = gameData.getBetAmount();
+	    	gamePanel.setScoreLabel(gamePanel.getScoreLabel() - betAmount);
+	    	gamePanel.setPotLabel(gamePanel.getPot() + betAmount);
+	    }
+	    
+	    if (gameData.isEndOfHand())
+	    {
+	    	gamePanel.setPlayerTurnLabel("");
+	    	
+	    }
+	}
+	
+	public void displayError(String error)
+	{
+	  GamePanel gamePanel = (GamePanel)container.getComponent(4);
+	  gamePanel.setError(error);
 	}
 
 	

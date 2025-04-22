@@ -3,6 +3,7 @@ package ClientCommunication;
 import ClientUserInterface.*;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import CardGameData.*;
 import CardGameData.Error;
@@ -93,15 +94,21 @@ public class GameClient extends AbstractClient
 	    else if (arg0 instanceof GameData) {
 	        GameData gameData = (GameData) arg0;
 	        System.out.println("📬 GameData received from server: start=" + gameData.getStart() + ", inGame=" + gameData.isInGame() + ", user=" + gameData.getUsername());
+	        
+	        
 
-	        if(gameData.getStart() && gameData.isInGame()) {
-	            gsc.startGame();  // Show GamePanel
-	        } else {
-	            wrc.showWaitingRoom(); // Show waiting room
-	            wrc.updatePlayerList(gameData.getPlayers());
+	        if (gameData.getStart()) 
+	        {
+	        	SwingUtilities.invokeLater(() -> {
+	        	    gc.showGamePanel();
+	        	    gc.initializePanel(gameData);
+	        	});
 	        }
-
-	        gc.updatePanel(gameData); // or wrc.updatePanel(gameData) if needed
+	        else
+	        {
+	        	gc.updatePanel(gameData);
+	        }
+	        
 	    }
 
 
@@ -111,6 +118,12 @@ public class GameClient extends AbstractClient
 	        
 	        wrc.showWaitingRoom();
 	        wrc.updatePanel(lobbyData);
+	        wrc.setPlayers(lobbyData);
+	        
+	        if(lobbyData.getStart()) 
+	        {
+	        	
+	        }
 	        
 
 	        /*
@@ -142,7 +155,8 @@ public class GameClient extends AbstractClient
 	
 	public void connectionException(Throwable exception)
 	{
-		
+		System.out.println("[GameClient] 💥 Connection exception occurred:");
+	    exception.printStackTrace();
 	}
 	
 	public void connectionEstablished()
@@ -156,9 +170,9 @@ public class GameClient extends AbstractClient
 	}
 	
 	@Override
-	protected void connectionClosed() {
-	    System.out.println("CLIENT CONNECTION CLOSED (this = " + this + ")");
-	}
+    protected void connectionClosed() {
+        System.out.println("[GameClient] Connection closed.");
+    }
 
 
 }

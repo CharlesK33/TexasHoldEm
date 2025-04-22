@@ -9,7 +9,7 @@ import java.util.List;
 public class WaitingRoomPanel extends JPanel {
 
     private DefaultListModel<String> playerListModel;
-    private String[] playerLabels = {"", "", "", "", ""};
+    
     private JLabel player1;
     private JLabel player2;
     private JLabel player3;
@@ -59,6 +59,7 @@ public class WaitingRoomPanel extends JPanel {
         buttonPanel.setBackground(new Color(30, 92, 58));
         startHand = new JButton("Start Hand");
         startHand.addActionListener(wrc);
+        startHand.setVisible(false);
         buttonPanel.add(startHand);
         
         JPanel grid = new JPanel(new GridLayout(3, 1));
@@ -106,6 +107,11 @@ public class WaitingRoomPanel extends JPanel {
         
         this.revalidate();
         this.repaint();
+    }
+    
+    public void showStartHand()
+    {
+    	startHand.setVisible(true);
     }
 
 

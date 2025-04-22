@@ -9,9 +9,17 @@ private String username;
 private int score;
 private int pot;
 private int currentBet;
+private int dealerIndex;
+private int playerTurn;
+private int betAmount;
 private boolean start;
+private boolean isFolding;
+private boolean endOfHand;
+private int turnCount;
 private Hand hand;
-private ArrayList<Card> board;
+private ArrayList<Card> flop;
+private Card turn;
+private Card river;
 private boolean inGame;
 private List<String> players;
 
@@ -61,15 +69,32 @@ public Hand getHand()
 	return hand; 
 }
 
-
-public void setBoard(ArrayList<Card> board) 
+public void setDealer(int dealerIndex)
 {
-    this.board = board;
+	this.dealerIndex = dealerIndex;
 }
 
-public ArrayList<Card> getBoard() 
+public int getDealer()
 {
-    return board;
+	return dealerIndex;
+}
+
+public boolean isDealer(int dealerIndex)
+{
+	if(dealerIndex == this.dealerIndex)
+		return true;
+	else 
+		return false;
+}
+
+public void setFlop(ArrayList<Card> flop) 
+{
+    this.flop = flop;
+}
+
+public ArrayList<Card> getFlop() 
+{
+    return flop;
 }
 
 public boolean isInGame() 
@@ -88,6 +113,49 @@ public List<String> getPlayers() {
 
 public void setPlayers(List<String> players) {
     this.players = players;
+}
+
+public int getPlayerTurn() {
+	return playerTurn;
+}
+public void setPlayerTurn(int playerTurn) {
+	this.playerTurn = playerTurn;
+}
+public boolean isFolding() {
+	return isFolding;
+}
+public void setFolding(boolean isFolding) {
+	this.isFolding = isFolding;
+}
+public int getTurnCount() {
+	return turnCount;
+}
+public void setTurnCount(int turnCount) {
+	this.turnCount = turnCount;
+}
+public Card getTurn() {
+	return turn;
+}
+public void setTurn(Card turn) {
+	this.turn = turn;
+}
+public Card getRiver() {
+	return river;
+}
+public void setRiver(Card river) {
+	this.river = river;
+}
+public int getBetAmount() {
+	return betAmount;
+}
+public void setBetAmount(int betAmount) {
+	this.betAmount = betAmount;
+}
+public boolean isEndOfHand() {
+	return endOfHand;
+}
+public void setEndOfHand(boolean endOfHand) {
+	this.endOfHand = endOfHand;
 }
 
 }
