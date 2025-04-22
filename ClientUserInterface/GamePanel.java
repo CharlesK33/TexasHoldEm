@@ -46,7 +46,8 @@ public class GamePanel extends JPanel
 	private JButton increaseButton;
 	private JButton decreaseButton;
 	private JButton enterButton;
-	private JButton dealCards;
+	private JButton ready;
+	private JButton startHand;
 	private JLabel card1;
 	private JLabel card2;
 	private JLabel flop1, flop2, flop3, turn, river;
@@ -286,6 +287,17 @@ public class GamePanel extends JPanel
 		turnPanel.add(turnLabelP1);
 		turnPanel.add(playerTurnLabel);
 		turnPanel.add(turnLabelP2);
+		JPanel endOfHand = new JPanel(new GridLayout(2, 1, 10, 10));
+		endOfHand.setBackground(background);
+		startHand = new JButton("Start Hand");
+		startHand.addActionListener(gc);
+		startHand.setVisible(false);
+		ready = new JButton("Ready");
+		ready.addActionListener(gc);
+		ready.setVisible(false);
+		endOfHand.add(ready);
+		endOfHand.add(startHand);
+		
 		
 		// Game Screen
 		JPanel border = new JPanel(new BorderLayout());
@@ -299,7 +311,10 @@ public class GamePanel extends JPanel
 		south.add(southBorder);
 		center.add(centerBorder);
 		east.add(buttonPanel);
-		west.add(turnPanel);
+		JPanel westBorder = new JPanel(new BorderLayout());
+		westBorder.add(turnPanel, BorderLayout.NORTH);
+		westBorder.add(endOfHand, BorderLayout.SOUTH);
+		west.add(westBorder);
 		
 		north.setBackground(background);
 		south.setBackground(background);
@@ -490,10 +505,15 @@ public class GamePanel extends JPanel
 		playerBet.setText(Integer.toString(bet));
 	}
 	
-	public void showDealCards()
+	public void showStartHand()
     {
-    	dealCards.setVisible(true);
+    	startHand.setVisible(true);
     }
+	
+	public void hideStartHand()
+	{
+		startHand.setVisible(false);
+	}
 
 	
 	//Parses the best amount entered by the player
@@ -612,6 +632,30 @@ public class GamePanel extends JPanel
 		
 		this.river.setIcon(card);
 	}
+	
+	public void showReadyButton()
+	{
+		ready.setVisible(true);
+	}
+	
+	public void hideReadyButton()
+	{
+		ready.setVisible(false);
+	}
+	
+	public void resetBoard()
+	{
+		String path = "images/back_of_card.png";
+		
+		ImageIcon card = new ImageIcon(path);
+		
+		flop1.setIcon(card);
+		flop2.setIcon(card);
+		flop3.setIcon(card);
+		turn.setIcon(card);
+		river.setIcon(card);
+	}
+	
 
 
 	

@@ -166,6 +166,8 @@ public class GameServer extends AbstractServer {
         		updatedData.setStart(true);
         		updatedData.setPlayers(data.getPlayers());
         		updatedData.setDealer(0);
+        		gameServerControl.setCurrentPlayerIndex(0);
+        		gameServerControl.setRoundCount(0);
         		
         		sendToAllClients(updatedData);
         		
@@ -287,6 +289,10 @@ public class GameServer extends AbstractServer {
             	{
             		gameData.setRiver(gameServerControl.dealRiver());
             	}
+            	else if (roundCount > 3)
+            	{
+            		gameData.setEndOfHand(true);
+            	}
             	
             }
             
@@ -324,6 +330,10 @@ public class GameServer extends AbstractServer {
             	else if (roundCount == 3)
             	{
             		gameData.setRiver(gameServerControl.dealRiver());
+            	}
+            	else if (roundCount > 3)
+            	{
+            		gameData.setEndOfHand(true);
             	}
             	
             }
@@ -366,6 +376,10 @@ public class GameServer extends AbstractServer {
             	else if (roundCount == 3)
             	{
             		gameData.setRiver(gameServerControl.dealRiver());
+            	}
+            	else if (roundCount > 3)
+            	{
+            		gameData.setEndOfHand(true);
             	}
             	
             }

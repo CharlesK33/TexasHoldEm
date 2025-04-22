@@ -237,6 +237,30 @@ public class GameControl implements ActionListener
 			    return;
 			}
 		}
+		else if (command.equals("Ready"))
+		{
+			
+		}
+		else if (command.equals("Start Hand"))
+		{
+			//GamePanel gamePanel = (GamePanel)container.getComponent(4);
+			
+			GameData gameData = new GameData();
+        	gameData.setPlayers(players);
+        	gameData.setCurrentBet(10);
+        	gameData.setPot(15);
+        	gameData.setStart(true);
+        	gameData.setFlop(null);
+        	gameData.setTurn(null);
+        	gameData.setRiver(null);
+        	
+        	try {
+				client.sendToServer(gameData);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 	
 	public void showGamePanel()
@@ -250,6 +274,9 @@ public class GameControl implements ActionListener
 		GamePanel gamePanel = (GamePanel) container.getComponent(4);
 		gamePanel.setPotLabel(gameData.getPot());
 		gamePanel.setCurrentBetLabel(gameData.getCurrentBet());
+		gamePanel.hideReadyButton();
+		gamePanel.hideStartHand();
+		gamePanel.resetBoard();
 		players = (ArrayList<String>) gameData.getPlayers();
 		
 		if (players.size() == 1)
@@ -260,7 +287,7 @@ public class GameControl implements ActionListener
 		}
 		else if (players.size() == 2)
 		{
-			String player = players.get(gameData.getDealer() + 1);
+			String player = players.get(0);
 	    	gamePanel.setPlayerTurnLabel(player);
 	    	
 			gamePanel.setPlayer1Label(players.get(0));
@@ -273,7 +300,7 @@ public class GameControl implements ActionListener
 		}
 		else if (players.size() == 3)
 		{
-			String player = players.get(gameData.getDealer() + 2);
+			String player = players.get(0);
 	    	gamePanel.setPlayerTurnLabel(player);
 	    	
 			gamePanel.setPlayer1Label(players.get(0));
@@ -290,7 +317,7 @@ public class GameControl implements ActionListener
 		}
 		else if (players.size() == 4)
 		{
-			String player = players.get(gameData.getDealer());
+			String player = players.get(0);
 	    	gamePanel.setPlayerTurnLabel(player + 2);
 	    	
 			gamePanel.setPlayer1Label(players.get(0));
@@ -311,7 +338,7 @@ public class GameControl implements ActionListener
 		}
 		else if (players.size() == 5)
 		{
-			String player = players.get(gameData.getDealer());
+			String player = players.get(0);
 	    	gamePanel.setPlayerTurnLabel(player + 2);
 	    	
 			gamePanel.setPlayer1Label(players.get(0));
@@ -406,8 +433,9 @@ public class GameControl implements ActionListener
 	    
 	    if (gameData.isEndOfHand())
 	    {
-	    	gamePanel.setPlayerTurnLabel("");
-	    	
+	    	gamePanel.setPlayerTurnLabel("player 1");
+	    	gamePanel.showReadyButton();
+	    	gamePanel.showStartHand();
 	    }
 	}
 	
