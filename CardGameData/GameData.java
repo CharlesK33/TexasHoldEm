@@ -15,6 +15,8 @@ private int betAmount;
 private boolean start;
 private boolean isFolding;
 private boolean endOfHand;
+private PokerHand winner;
+private int winnerIndex;
 private int turnCount;
 private Hand hand;
 private ArrayList<Card> flop;
@@ -156,6 +158,18 @@ public boolean isEndOfHand() {
 }
 public void setEndOfHand(boolean endOfHand) {
 	this.endOfHand = endOfHand;
+}
+public PokerHand getWinner() {
+	return winner;
+}
+public void setWinner(PokerHand winner) {
+	this.winner = winner;
+}
+public int getWinnerIndex() {
+	return winnerIndex;
+}
+public void setWinnerIndex(int winnerIndex) {
+	this.winnerIndex = winnerIndex;
 }
 
 }

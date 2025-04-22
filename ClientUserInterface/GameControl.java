@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import ClientCommunication.*;
+import ocsf.server.ConnectionToClient;
 import CardGameData.*;
 
 public class GameControl implements ActionListener
@@ -14,6 +15,7 @@ public class GameControl implements ActionListener
 	private JPanel container;
 	private GameClient client;
 	private ArrayList<String> players;
+	private ArrayList<Card> cards = new ArrayList<>();
 	
 	public GameControl(JPanel container, GameClient client)
 	{
@@ -395,8 +397,10 @@ public class GameControl implements ActionListener
 	    if (gameData.getHand() != null)
 	    {
 	    	gamePanel.setCardImages(gameData.getHand().getHand().getFirst(), gameData.getHand().getHand().getLast());
+	    	//cards.add(gameData.getHand().getHand().getFirst());
+	    	//cards.add(gameData.getHand().getHand().getLast());
 	    }
-	    
+	   
 	    if (gameData.isFolding()) 
 	    {
 	    	gamePanel.removeFoldedPlayer(players, gameData.getUsername());
@@ -404,17 +408,25 @@ public class GameControl implements ActionListener
 	    
 	    if (gameData.getFlop() != null)
 	    {
-	    	gamePanel.showFlop(gameData.getFlop());
+	    	ArrayList<Card> flop = gameData.getFlop();
+	    	gamePanel.showFlop(flop);
+	    
+	    	//for (int i = 0; i < flop.size(); i++)
+	    	//{
+	    	//	cards.add(flop.get(i));
+	    	//}
 	    }
 	    
 	    if (gameData.getTurn() != null)
 	    {
 	    	gamePanel.showTurn(gameData.getTurn());
+	    	//cards.add(gameData.getTurn());
 	    }
 	    
 	    if (gameData.getRiver() != null)
 	    {
 	    	gamePanel.showRiver(gameData.getRiver());
+	    	//cards.add(gameData.getRiver());
 	    }
 	    
 	    if (gameData.getUsername() != null && gameData.getUsername().equals(gamePanel.getUsername()) && gameData.getBetAmount() == gamePanel.getCurrentBet()) 
@@ -433,10 +445,54 @@ public class GameControl implements ActionListener
 	    
 	    if (gameData.isEndOfHand())
 	    {
+	    	int i = 0;
+	    	
+	    	PokerHandData data= new PokerHandData(i);
+	    	data.setPlayerCards(cards);
+	    	
+	    	/*
+	    	try {
+				client.sendToServer(data);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			*/
+			
+	    	
 	    	gamePanel.setPlayerTurnLabel("player 1");
 	    	gamePanel.showReadyButton();
 	    	gamePanel.showStartHand();
+	    	i++;
+	    	
 	    }
+	    
+	    
+	    if (gameData.getWinnerIndex() != 0)
+	    {
+	    	PokerHand winner = gameData.getWinner();
+	    	int winnerIndex = gameData.getWinnerIndex();
+	    	
+	    	ArrayList<Card> winningCards = new ArrayList<>();
+	    	
+	    	for (int i = 0; i < winner.getCards().size(); i++)
+	    	{
+	    		winningCards.add(winner.getCards().get(i));
+	    	}
+	    	
+	    	String winnerName = "";
+	    	for (int i = 0; i < players.size(); i++)
+	    	{
+	    		if (players.get(i) == players.get(winnerIndex))
+	    		{
+	    			winnerName = players.get(i);
+	    		}
+	    	}
+	    	
+	    	gamePanel.showWinner(winnerName);
+	    }
+	    
+	   
 	}
 	
 	public void displayError(String error)

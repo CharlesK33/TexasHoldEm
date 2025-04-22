@@ -38,6 +38,7 @@ public class GamePanel extends JPanel
 	private JPanel player5Cards;
 	private JLabel backOfCard1;
 	private JLabel backOfCard2;
+	private JLabel winnerLabel;
 	private JButton checkButton;
 	private JButton betButton;
 	private JButton raiseButton;
@@ -181,6 +182,12 @@ public class GamePanel extends JPanel
 		playerPanel.add(player3Panel);
 		playerPanel.add(player4Panel);
 		playerPanel.add(player5Panel);
+		//JPanel winnerPanel = new JPanel();
+		//winnerLabel = new JLabel("");
+		//winnerLabel.setForeground(new Color(255, 215, 0));
+		//winnerLabel.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		//winnerPanel.add(winnerLabel);
+		
 		
 		// Player information (south partition)
 		
@@ -301,13 +308,16 @@ public class GamePanel extends JPanel
 		
 		// Game Screen
 		JPanel border = new JPanel(new BorderLayout());
+		JPanel northBorder = new JPanel(new BorderLayout());
+		northBorder.add(playerPanel, BorderLayout.NORTH);
+		//northBorder.add(winnerPanel, BorderLayout.SOUTH);
 		JPanel southBorder = new JPanel(new BorderLayout());
 		southBorder.add(cardPanel, BorderLayout.NORTH);
 		southBorder.add(currentPlayerPanel, BorderLayout.SOUTH);
 		JPanel centerBorder = new JPanel(new BorderLayout());
 		centerBorder.add(betInfoPanel, BorderLayout.NORTH);
 		centerBorder.add(communityCardPanel, BorderLayout.SOUTH);
-		north.add(playerPanel);
+		north.add(northBorder);
 		south.add(southBorder);
 		center.add(centerBorder);
 		east.add(buttonPanel);
@@ -589,17 +599,6 @@ public class GamePanel extends JPanel
 		card2.setIcon(image2);
 	}
 	
-	public void setCommunityCards(ArrayList<Card> board) {
-	    JLabel[] labels = {flop1, flop2, flop3, turn, river};
-	    for (int i = 0; i < 5; i++) {
-	        if (i < board.size()) {
-	            labels[i].setIcon(new ImageIcon("images/" + board.get(i).getFileName()));
-	        } else {
-	            labels[i].setIcon(null); //Clear if not yet dealt
-	        }
-	    }
-	}
-	
 	public void showFlop(ArrayList<Card> flop)
 	{
 		String path1 = "images/" + flop.get(0).getFileName();
@@ -641,6 +640,11 @@ public class GamePanel extends JPanel
 	public void hideReadyButton()
 	{
 		ready.setVisible(false);
+	}
+	
+	public void showWinner(String winner)
+	{
+		winnerLabel.setText(winner);
 	}
 	
 	public void resetBoard()

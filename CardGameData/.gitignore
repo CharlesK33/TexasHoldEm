@@ -15,3 +15,8 @@
 /Card$Value.class
 /StartGameData.class
 /LobbyData.class
+/PokerHand.class
+/HandRank.class
+/Hand$HandRank.class
+/HandType.class
+/PokerHandData.class

@@ -15,6 +15,7 @@ public class GameServer extends AbstractServer {
     private Database database = new Database();
     private boolean running;
     private GameServerControl gameServerControl = new GameServerControl();
+    private ArrayList<PokerHand> playerHands;
 
     public GameServer() {
         super(8300);
@@ -388,32 +389,36 @@ public class GameServer extends AbstractServer {
             
             
             sendToAllClients(gameData);
-            
-            
+        }
+        else if (arg0 instanceof PokerHandData)
+        {
+        	PokerHandData data = (PokerHandData)arg0;
+        	
+        	ArrayList<Card> cards = data.getPlayerCards();
+        	
+        	PokerHand hand = gameServerControl.evaluateBestHand(cards);
+        	
+        	playerHands.add(hand);
+        	
+        	if (playerHands.size() == gameServerControl.getPlayers().size())
+        	{
+        		PokerHand winner = gameServerControl.determineWinner(playerHands);
+        		
+        		GameData gameData = new GameData();
+            	gameData.setWinner(winner);
+            	gameData.setWinnerIndex(data.getPlayerIndex());
+            	
+            	sendToAllClients(gameData);
+        	}
+        	
+        	
+        	
         }
     }
 
     public String getClientUsername(ConnectionToClient client) {
         return (String) client.getInfo("username");
     }
-
-    /*
-    public void broadcastGameState() {
-        for (ConnectionToClient conn : getAllClients()) {
-            String username = getClientUsername(conn);
-            if (username == null) continue;
-
-            GameData data = gameServerControl.getGameDataForPlayer(username);
-            try {
-                conn.sendToClient(data);
-                log.append("Sent GameData to " + username + "\n");
-            } catch (IOException e) {
-                log.append("Failed to send game state to " + username + ": " + e.getMessage() + "\n");
-                e.printStackTrace();
-            }
-        }
-    }
-    */
 
     private ArrayList<ConnectionToClient> getAllClients() {
         ArrayList<ConnectionToClient> clients = new ArrayList<>();
