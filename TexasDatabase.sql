@@ -1,9 +1,8 @@
-CREATE DATABASE texas_holdem;
+drop table users;
 
-USE texas_holdem;
+CREATE TABLE users
+	(username		varchar(25),
+	password		varbinary(16));
 
-CREATE TABLE users (
-    username VARCHAR(50) PRIMARY KEY,
-    password VARBINARY(255) NOT NULL,
-    score INT DEFAULT 0
-);
+alter table users	
+	add constraint user_username_pk primary key(username);
